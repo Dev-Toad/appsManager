@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Usuario{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-md">
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <h1 class="text-2xl font-bold text-center mb-6">Registrar Usuario</h1>
+
+        <form method="POST" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Usuario</label>
+                <input type="text" name="username" required
+                       class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Contraseña</label>
+                <input type="password" name="password" required
+                       class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Rol</label>
+                <select name="rol_id" required class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="">Seleccionar rol</option>
+                    <option value="1">Desarrollador</option>
+                    <option value="2">QA</option>
+                    <option value="3">DevOps</option>
+                </select>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300">
+                Registrar
+            </button>
+        </form>
+
+        <div class="mt-6 text-center">
+            <a href="{{ url_for('auth.login') }}" class="text-blue-600 hover:underline text-sm">
+                ← Volver al login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

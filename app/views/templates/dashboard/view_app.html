@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}{{ app.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">{{ app.nombre }}</h1>
+        <div class="space-x-2">
+            <a href="{{ url_for('app.edit_app', app_id=app.id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">Editar App</a>
+            <a href="{{ url_for('version.new_version', app_id=app.id) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">+ Nueva Versión</a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <strong>Descripción:</strong>
+                <p>{{ app.descripcion or 'Sin descripción' }}</p>
+            </div>
+            <div>
+                <strong>Repositorio:</strong>
+                <p>
+                    {% if app.repositorio_url %}
+                        <a href="{{ app.repositorio_url }}" target="_blank" class="text-blue-600 underline">{{ app.repositorio_url }}</a>
+                    {% else %}
+                        No disponible
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div><strong>Tipo:</strong> {{ app.tipo or '-' }}</div>
+            <div><strong>Stack:</strong> {{ app.stack or '-' }}</div>
+            <div><strong>Framework:</strong> {{ app.framework or '-' }}</div>
+            <div><strong>Dueño:</strong> {{ app.owner.username }} ({{ app.owner.role.nombre }})</div>
+            <div><strong>Estado:</strong> {{ app.estado }}</div>
+            <div><strong>Tipo Entorno:</strong> {{ app.tipo_entorno|title }}</div>
+            {% if app.tipo_entorno == 'docker' and app.version_docker %}
+            <div><strong>Versión Docker:</strong> {{ app.version_docker }}</div>
+            {% endif %}
+            <div><strong>Creada:</strong> {{ app.fecha_creacion.strftime('%d/%m/%Y') if app.fecha_creacion else '-' }}</div>
+        </div>
+    </div>
+
+    <h2 class="text-2xl font-semibold mb-4">Versiones</h2>
+
+    {% if versions|length == 0 %}
+        <div class="bg-gray-100 p-4 rounded mb-6">
+            No hay versiones. <a href="{{ url_for('version.new_version', app_id=app.id) }}" class="text-blue-600 underline">Crear primera versión</a>.
+        </div>
+    {% else %}
+        <div class="space-y-4">
+            {% for version in versions %}
+            <div class="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-xl font-bold">{{ version.numero_version }} - {{ version.titulo }}</h3>
+                        <p class="text-gray-600 text-sm mt-1">{{ version.descripcion or 'Sin descripción' }}</p>
+                        
+                        <!-- Documentación -->
+                        <p class="text-xs text-gray-500 mt-2">
+                            {% if version.documentacion_url %}
+                                📄 <a href="{{ version.documentacion_url }}" target="_blank" class="text-blue-600 hover:underline">Ver documentación</a>
+                            {% else %}
+                                📄 Documentación no disponible
+                            {% endif %}
+                        </p>
+
+                        <!-- SO Compatible -->
+                        <p class="text-xs text-gray-500 mt-1">
+                            {% if version.so_compatibles %}
+                                🖥️ SO: 
+                                {% for so in version.so_compatibles %}
+                                    {{ so.nombre_so }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                🖥️ SO: No definido
+                            {% endif %}
+                        </p>
+
+                        <!-- Soporte -->
+                        <p class="text-xs text-gray-500 mt-1">
+                            📅 Soporte: 
+                            {% if version.fecha_fin_soporte %}
+                                {{ version.fecha_inicio_soporte.strftime('%d/%m/%Y') if version.fecha_inicio_soporte else 'N/A' }} - 
+                                {{ version.fecha_fin_soporte.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                <span class="text-green-600 font-medium">Activa</span>
+                            {% endif %}
+                        </p>
+
+                        <!-- Dueño -->
+                        <p class="text-xs text-gray-500 mt-1">
+                            👤 Dueño: {{ version.release_owner.username }}
+                        </p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="{{ url_for('version.edit_version', version_id=version.id) }}" class="text-yellow-600 hover:underline text-sm">Editar</a>
+                        <form method="POST" action="{{ url_for('version.delete_version', version_id=version.id) }}" class="inline" onsubmit="return confirm('¿Eliminar versión?')">
+                            <button type="submit" class="text-red-600 hover:underline text-sm">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

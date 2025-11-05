@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Aplicación{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="mb-6">
+        <a href="{{ url_for('app.dashboard') }}" class="text-blue-600 hover:underline flex items-center">
+            ← Volver al Dashboard
+        </a>
+        <h1 class="text-2xl font-bold mt-2">Crear Nueva Aplicación</h1>
+    </div>
+
+    <form method="POST" class="bg-white rounded-lg shadow-md p-6 space-y-6">
+        <div>
+            <label class="block text-sm font-medium mb-1">Nombre *</label>
+            <input type="text" name="nombre" required class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium mb-1">Descripción</label>
+            <textarea name="descripcion" rows="3" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Tipo</label>
+                <input type="text" name="tipo" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Stack</label>
+                <input type="text" name="stack" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Framework</label>
+                <input type="text" name="framework" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Estado</label>
+                <select name="estado" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="Activa" selected>Activa</option>
+                    <option value="Inactiva">Inactiva</option>
+                    <option value="En desarrollo">En desarrollo</option>
+                    <option value="Obsoleta">Obsoleta</option>
+                </select>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+        <label class="block text-sm font-medium mb-1">Tipo de Entorno *</label>
+        <select name="tipo_entorno" required class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" id="tipo_entorno">
+            <option value="servidor">Servidor Ubuntu</option>
+            <option value="docker">Contenedor Docker</option>
+        </select>
+    </div>
+    <div id="docker_version_field" class="hidden">
+        <label class="block text-sm font-medium mb-1">Versión Docker</label>
+        <input type="text" name="version_docker" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="20.10.7, 24.0.5, etc.">
+    </div>
+</div>
+
+        <div>
+            <label class="block text-sm font-medium mb-1">URL Repositorio</label>
+            <input type="url" name="repositorio_url" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://github.com/usuario/repo">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium mb-1">Fecha de Creación</label>
+            <input type="date" name="fecha_creacion" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" value="{{ '' }}">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium mb-1">Dueño *</label>
+            <select name="owner_id" required class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="">Seleccionar dueño</option>
+                {% for user in users %}
+               <option value="{{ user.id }}">{{ user.username }} - Desarrollador</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="flex space-x-4 pt-4">
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-medium transition duration-300">
+                Crear Aplicación
+            </button>
+            <a href="{{ url_for('app.dashboard') }}" class="bg-gray-300 hover:bg-gray-400 px-6 py-3 rounded font-medium transition duration-300 text-center">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+<script>
+    document.getElementById('tipo_entorno').addEventListener('change', function() {
+        const dockerField = document.getElementById('docker_version_field');
+        if (this.value === 'docker') {
+            dockerField.classList.remove('hidden');
+        } else {
+            dockerField.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

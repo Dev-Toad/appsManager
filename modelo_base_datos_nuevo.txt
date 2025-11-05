@@ -1,0 +1,73 @@
+
+
+roles
+id_rol
+nombre 
+descripcion
+estado(activo, inactivo) 
+
+
+Desarrollador
+QA 
+DevOps
+Admin
+
+usuarios
+id_usuario
+nombre
+apellido
+email
+password
+id_rol
+estado(activo, inactivo)
+
+
+lenguajes
+id_lenguaje
+nombre
+descripcion
+estado(activo, inactivo)
+
+
+
+frameworks
+
+
+Aplicaciones 
+id_aplicacion,
+fecha_creacion,
+nombre,
+descripcion,
+tipo(web, api, robot, bash_script, web_scraping, app,mobile),
+tipo_entorno(docker, kubernetes, serverless, servidor),
+lenguaje(python, javaScript, c++, ruby, go, c, kotlin, php, pearl, bash),
+framework(flask, django, django rest, fastapi, react, angular, vue, spring, laravel, symfony, ruby on rails, express, ember, svelte),
+url_dockerhub,
+url_repostitorio,
+url_documentacion,
+estado(activo, deprecada)
+
+
+
+
+
+sistemas_operativos
+id_so
+nombre
+descripcion
+estado(activo, inactivo)
+
+
+versiones
+id_version
+id_aplicacion
+num_version
+titulo
+descripcion 
+url_documentacion
+url_paquete_deb, 
+ownner 
+fecha_inicio_soporte
+fecha_fin_soporte
+estado(activo, deprecada)
+id_so 

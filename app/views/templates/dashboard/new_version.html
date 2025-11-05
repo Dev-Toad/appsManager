@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Versión - {{ app.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="mb-6">
+        <a href="{{ url_for('app.view_app', app_id=app.id) }}" class="text-blue-600 hover:underline flex items-center">
+            ← Volver a "{{ app.nombre }}"
+        </a>
+        <h1 class="text-2xl font-bold mt-2">Crear Nueva Versión</h1>
+    </div>
+
+    <form method="POST" class="bg-white rounded-lg shadow-md p-6 space-y-6">
+        <div>
+            <label class="block text-sm font-medium mb-1">Número de Versión *</label>
+            <input type="text" name="numero_version" required placeholder="Ej: 1.0.0, 2.1.3" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Título *</label>
+            <input type="text" name="titulo" required
+                class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium mb-1">Descripción</label>
+            <textarea name="descripcion" rows="3"
+                class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium mb-1">URL Documentación</label>
+            <input type="url" name="documentacion_url"
+                class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Gestor de BD</label>
+                <input type="text" name="gestor_bd"
+                    class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Versión Gestor BD</label>
+                <input type="text" name="version_gestor_bd"
+                    class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium mb-1">Dependencias (separadas por comas)</label>
+            <textarea name="dependencias" rows="3"
+                class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Flask==3.0.0, psycopg2-binary==2.9.9, etc."></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Fecha Inicio Soporte</label>
+                <input type="date" name="fecha_inicio_soporte"
+                    class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Fecha Fin Soporte</label>
+                <input type="date" name="fecha_fin_soporte"
+                    class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium mb-1">Dueño *</label>
+            <select name="owner_id" required
+                class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="">Seleccionar dueño</option>
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }} ({{ user.role.nombre }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="flex space-x-4 pt-4">
+            <button type="submit"
+                class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-medium transition">Crear
+                Versión</button>
+            <a href="{{ url_for('app.view_app', app_id=app.id) }}"
+                class="bg-gray-300 hover:bg-gray-400 px-6 py-3 rounded font-medium transition text-center">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
