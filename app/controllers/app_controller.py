@@ -4,17 +4,13 @@ from app.models import Application, User, Role, Version
 from app.config import db 
 from datetime import datetime
 
-app_bp = Blueprint('app', __name__)
+# app_bp = Blueprint('app', __name__)
 
-@app_bp.route('/dashboard')
-@login_required
+
 def dashboard():
-    # Mostrar solo apps del usuario actual
     apps = Application.query.all()
     return render_template('dashboard/applications.html', apps=apps)
 
-@app_bp.route('/app/new', methods=['GET', 'POST'])
-@login_required
 def new_app():
     if request.method == 'POST':
         nombre = request.form['nombre']
@@ -29,7 +25,6 @@ def new_app():
         tipo_entorno = request.form.get('tipo_entorno', 'servidor')
         version_docker = request.form.get('version_docker') if tipo_entorno == 'docker' else None
 
-        # Validar que el owner exista y sea desarrollador
         owner = User.query.join(Role).filter(User.id == owner_id, Role.nombre == 'Desarrollador').first()
         if not owner:
             flash('Usuario dueño no válido o no es Desarrollador')
@@ -53,12 +48,10 @@ def new_app():
         flash('Aplicación creada con éxito')
         return redirect(url_for('app.dashboard'))
 
-    # ✅ Obtener SOLO usuarios con rol "Desarrollador"
     developers = User.query.join(Role).filter(Role.nombre == 'Desarrollador').all()
     return render_template('dashboard/new_app.html', users=developers)
 
-@app_bp.route('/app/<int:app_id>/edit', methods=['GET', 'POST'])
-@login_required
+
 def edit_app(app_id):
     app = Application.query.get_or_404(app_id)
     if app.owner_id != current_user.id:
@@ -75,7 +68,6 @@ def edit_app(app_id):
         app.fecha_creacion = request.form.get('fecha_creacion')
         app.owner_id = request.form['owner_id']
 
-        # Validar nuevo owner
         owner = User.query.join(Role).filter(User.id == app.owner_id, Role.nombre == 'Desarrollador').first()
         if not owner:
             flash('Usuario dueño no válido o no es Desarrollador')
@@ -88,8 +80,6 @@ def edit_app(app_id):
     developers = User.query.join(Role).filter(Role.nombre == 'Desarrollador').all()
     return render_template('dashboard/edit_app.html', app=app, users=developers)
 
-@app_bp.route('/app/<int:app_id>/delete', methods=['POST'])
-@login_required
 def delete_app(app_id):
     app = Application.query.get_or_404(app_id)
     if app.owner_id != current_user.id:
@@ -100,8 +90,7 @@ def delete_app(app_id):
     flash('Aplicación eliminada')
     return redirect(url_for('app.dashboard'))
 
-@app_bp.route('/app/<int:app_id>')
-@login_required
+
 def view_app(app_id):
     app = Application.query.get_or_404(app_id)
     versions = Version.query.filter_by(aplicacion_id=app_id).order_by(Version.numero_version.desc()).all()

@@ -22,7 +22,7 @@
             {% if current_user.is_authenticated %}
                 <div class="flex items-center space-x-4">
                     <span>Hola, <strong>{{ current_user.username }}</strong> ({{ current_user.role.nombre }})</span>
-                    <a href="{{ url_for('auth.logout') }}" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm">Salir</a>
+                    <a href="{{ url_for('app.logout') }}" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm">Salir</a>
                 </div>
             {% endif %}
         </div>
