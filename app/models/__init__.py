@@ -1,7 +1,7 @@
 # app/models/__init__.py
 
-from .role import Role
-from .user import User
-from .application import Application
-from .version import Version
-from .so_compatible import SOCompatible
+from .role import Role  # noqa: F401
+from .user import User  # noqa: F401
+from .application import Application  # noqa: F401
+from .version import Version  # noqa: F401
+from .so_compatible import SOCompatible  # noqa: F401
