@@ -19,7 +19,6 @@ def create_role_and_user():
     db.session.add(role)
     db.session.commit()
     user = User(username="dev", rol_id=role.id)
-    # set a usable password for tests
     user.set_password("x")
     db.session.add(user)
     db.session.commit()
@@ -39,11 +38,9 @@ def test_create_edit_delete_app():
 
         client = app.test_client()
 
-        # login
         resp = login_test_client(client, user.username)
         assert resp.status_code == 200
 
-        # Create app
         resp = client.post(
             "/new/app",
             data={
@@ -58,12 +55,11 @@ def test_create_edit_delete_app():
             follow_redirects=True,
         )
         assert resp.status_code == 200
-        assert b"Aplicaci" in resp.data  # flash or template contains 'Aplicaci' text
+        assert b"Aplicaci" in resp.data
 
         app_obj = Application.query.filter_by(nombre="MiApp").first()
         assert app_obj is not None
 
-        # Edit app
         resp = client.post(
             f"/app/{app_obj.id}/edit",
             data={
@@ -78,7 +74,6 @@ def test_create_edit_delete_app():
         app_obj = db.session.get(Application, app_obj.id)
         assert app_obj.nombre == "MiAppEdited"
 
-        # Delete app
         resp = client.post(f"/app/{app_obj.id}/delete", follow_redirects=True)
         assert resp.status_code == 200
         app_obj = db.session.get(Application, app_obj.id)
