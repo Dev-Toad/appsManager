@@ -34,7 +34,9 @@ def create_role_user_and_app():
 
 
 def login_test_client(client, username):
-    return client.post("/login", data={"username": username, "password": "x"}, follow_redirects=True)
+    return client.post(
+        "/login", data={"username": username, "password": "x"}, follow_redirects=True
+    )
 
 
 def test_create_edit_delete_version():
@@ -63,7 +65,9 @@ def test_create_edit_delete_version():
         )
         assert resp.status_code == 200
 
-        v = Version.query.filter_by(aplicacion_id=app_obj.id, numero_version="1.0").first()
+        v = Version.query.filter_by(
+            aplicacion_id=app_obj.id, numero_version="1.0"
+        ).first()
         assert v is not None
 
         # Edit version
