@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Nuevo Rol{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="mb-6">
+            <a href="{{ url_for('rol.list_roles') }}" 
+               class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Volver a la Lista de Roles
+            </a>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Header del Card -->
+            <div class="bg-gradient-to-r from-green-600 to-green-700 px-8 py-6">
+                <div class="flex items-center">
+                    <div class="bg-white bg-opacity-20 rounded-full p-3 mr-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">Crear Nuevo Rol</h1>
+                        <p class="text-green-100 mt-1">Define un nuevo rol y asigna sus permisos</p>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('rol.new_role') }}" class="p-8">
+                {{ form.hidden_tag() }}
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-green-500 flex items-center">
+                        <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Información Básica
+                    </h2>
+                    
+                    <div class="space-y-5 mt-6">
+                        <div>
+                            <label for="{{ form.name.id }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Nombre del Rol
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                    </svg>
+                                </div>
+                                {{ form.name(class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none", required=true, placeholder="Ej: Administrador, Moderador, Usuario") }}
+                            </div>
+                            {% for error in form.name.errors %}
+                                <p class="text-red-500 text-sm mt-1 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <label for="{{ form.descripcion.id }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Descripción
+                            </label>
+                            <div class="relative">
+                                <div class="absolute top-3 left-3 pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                    </svg>
+                                </div>
+                                {{ form.descripcion(rows="4", class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none resize-none", placeholder="Describe las responsabilidades y propósito de este rol...") }}
+                            </div>
+                            {% for error in form.descripcion.errors %}
+                                <p class="text-red-500 text-sm mt-1 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección: Permisos -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-6 pb-2 border-b-2 border-green-500">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            <h2 class="text-xl font-semibold text-gray-800">Permisos a Asignar</h2>
+                        </div>
+                        <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                            Selecciona los permisos necesarios
+                        </span>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {% for permission_field in form.permissions %}
+                                <label for="{{ permission_field.id }}" class="flex items-start gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm transition-all cursor-pointer group border border-transparent hover:border-green-200">
+                                    <div class="relative flex items-center justify-center pt-0.5">
+                                        {{ permission_field(class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-2 focus:ring-green-500 cursor-pointer") }}
+                                    </div>                                    
+                                    <span class="text-sm text-gray-700 group-hover:text-gray-900 leading-5 flex-1 select-none">
+                                        {{ permission_field.label.text }}
+                                    </span>
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        {% for error in form.permissions.errors %}
+                            <p class="text-red-500 text-sm mt-4 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+                    <button type="submit" 
+                            class="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Crear Rol
+                    </button>
+                    <a href="{{ url_for('rol.list_roles') }}" 
+                       class="flex-1 sm:flex-none bg-gray-200 hover:bg-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold transition-all duration-200 text-center flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Tip 1 -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <div class="flex">
+                    <svg class="w-5 h-5 text-blue-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-blue-800">Nombres descriptivos</p>
+                        <p class="text-xs text-blue-700 mt-1">Usa nombres claros que indiquen el propósito del rol (ej: "Editor de Contenido", "Supervisor de Ventas")</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tip 2 -->
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                <div class="flex">
+                    <svg class="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-green-800">Permisos mínimos</p>
+                        <p class="text-xs text-green-700 mt-1">Asigna solo los permisos necesarios siguiendo el principio de menor privilegio</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -2,12 +2,18 @@ from flask import render_template, request, redirect, url_for, flash, abort
 from flask_login import current_user
 from app.models import Version, Application, User, Role
 from app.config import db
+from app.decorators import permissions_required
 
 
+@permissions_required(["app:manage"])
 def new_version(app_id):
+    """Permite crear una nueva versión de una aplicación."""
     app = db.session.get(Application, app_id)
     if not app:
         abort(404)
+
+    if app.owner_id != current_user.id and current_user.role.name != "Administrator":
+        abort(403)
 
     if request.method == "POST":
         numero_version = request.form["numero_version"]
@@ -20,10 +26,9 @@ def new_version(app_id):
         fecha_inicio_soporte = request.form.get("fecha_inicio_soporte")
         fecha_fin_soporte = request.form.get("fecha_fin_soporte")
         owner_id = request.form["owner_id"]
-
         owner = (
             User.query.join(Role)
-            .filter(User.id == owner_id, Role.nombre == "Desarrollador")
+            .filter(User.id == owner_id, Role.name == "Desarrollador")
             .first()
         )
         if not owner:
@@ -48,15 +53,22 @@ def new_version(app_id):
         flash("Versión creada con éxito")
         return redirect(url_for("app.view_app", app_id=app_id))
 
-    developers = User.query.join(Role).filter(Role.nombre == "Desarrollador").all()
-    return render_template("dashboard/new_version.html", app=app, users=developers)
+    developers = User.query.join(Role).filter(Role.name == "Desarrollador").all()
+    return render_template(
+        "dashboard/version/new_version.html", app=app, users=developers
+    )
 
 
+@permissions_required(["app:manage"])
 def edit_version(version_id):
     version = db.session.get(Version, version_id)
     if not version:
         abort(404)
-    if version.release_owner.id != current_user.id:
+
+    if (
+        version.release_owner.id != current_user.id
+        and current_user.role.name != "Administrator"
+    ):
         abort(403)
 
     if request.method == "POST":
@@ -72,28 +84,34 @@ def edit_version(version_id):
 
         owner = (
             User.query.join(Role)
-            .filter(User.id == version.owner_id, Role.nombre == "Desarrollador")
+            .filter(User.id == version.owner_id, Role.name == "Desarrollador")
             .first()
         )
         if not owner:
             flash("Usuario dueño no válido o no es Desarrollador")
-            return redirect(url_for("app.edit_version", version_id=version_id))
+            return redirect(url_for("version.edit_version", version_id=version_id))
 
         db.session.commit()
         flash("Versión actualizada")
         return redirect(url_for("app.view_app", app_id=version.aplicacion_id))
 
-    developers = User.query.join(Role).filter(Role.nombre == "Desarrollador").all()
+    developers = User.query.join(Role).filter(Role.name == "Desarrollador").all()
     return render_template(
-        "dashboard/edit_version.html", version=version, users=developers
+        "dashboard/version/edit_version.html", version=version, users=developers
     )
 
 
+@permissions_required(["app:manage"])
 def delete_version(version_id):
+    """Permite eliminar una versión existente."""
     version = db.session.get(Version, version_id)
     if not version:
         abort(404)
-    if version.release_owner.id != current_user.id:
+
+    if (
+        version.release_owner.id != current_user.id
+        and current_user.role.name != "Administrator"
+    ):
         abort(403)
 
     app_id = version.aplicacion_id

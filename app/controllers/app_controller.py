@@ -3,16 +3,33 @@ from flask_login import current_user
 from app.models import Application, User, Role, Version
 from app.config import db
 from datetime import datetime
+from app.decorators import permissions_required
 
 
-def dashboard():
+def app_list():
     apps = Application.query.all()
-    return render_template("dashboard/applications.html", apps=apps)
+    return render_template("dashboard/applications/applications.html", apps=apps)
 
 
+def view_app(app_id):
+    """Muestra los detalles de una aplicación y sus versiones."""
+    app = db.session.get(Application, app_id)
+    if not app:
+        abort(404)
+    versions = (
+        Version.query.filter_by(aplicacion_id=app_id)
+        .order_by(Version.numero_version.desc())
+        .all()
+    )
+    return render_template(
+        "dashboard/applications/view_app.html", app=app, versions=versions
+    )
+
+
+@permissions_required(["app:manage"])
 def new_app():
+    """Permite crear una nueva aplicación. Requiere el permiso app:manage."""
     if request.method == "POST":
-        # Campos requeridos
         nombre = request.form.get("nombre")
         if not nombre:
             flash("El campo 'nombre' es requerido")
@@ -31,18 +48,15 @@ def new_app():
             request.form.get("version_docker") if tipo_entorno == "docker" else None
         )
 
-        # Normalizar owner_id a entero
         try:
             owner_id = int(owner_id_raw)
         except (TypeError, ValueError):
             flash("Owner inválido")
             return redirect(url_for("app.new_app"))
 
-        # Parsear fecha si viene
         fecha_creacion = None
         if fecha_creacion_raw:
             try:
-                # HTML date inputs typically send YYYY-MM-DD
                 fecha_creacion = datetime.fromisoformat(fecha_creacion_raw).date()
             except ValueError:
                 try:
@@ -55,7 +69,7 @@ def new_app():
 
         owner = (
             User.query.join(Role)
-            .filter(User.id == owner_id, Role.nombre == "Desarrollador")
+            .filter(User.id == owner_id, Role.name == "Desarrollador")
             .first()
         )
         if not owner:
@@ -86,19 +100,20 @@ def new_app():
         flash("Aplicación creada con éxito")
         return redirect(url_for("app.dashboard"))
 
-    developers = User.query.join(Role).filter(Role.nombre == "Desarrollador").all()
-    return render_template("dashboard/new_app.html", users=developers)
+    developers = User.query.join(Role).filter(Role.name == "Desarrollador").all()
+    return render_template("dashboard/applications/new_app.html", users=developers)
 
 
+@permissions_required(["app:manage"])
 def edit_app(app_id):
     app = db.session.get(Application, app_id)
     if not app:
         abort(404)
-    if app.owner_id != current_user.id:
+
+    if app.owner_id != current_user.id and current_user.role.name != "Administrator":
         abort(403)
 
     if request.method == "POST":
-        # Validaciones y normalizaciones
         nombre = request.form.get("nombre")
         if not nombre:
             flash("El campo 'nombre' es requerido")
@@ -134,7 +149,7 @@ def edit_app(app_id):
 
         owner = (
             User.query.join(Role)
-            .filter(User.id == owner_id, Role.nombre == "Desarrollador")
+            .filter(User.id == owner_id, Role.name == "Desarrollador")
             .first()
         )
         if not owner:
@@ -153,30 +168,22 @@ def edit_app(app_id):
         flash("Aplicación actualizada con éxito")
         return redirect(url_for("app.dashboard"))
 
-    developers = User.query.join(Role).filter(Role.nombre == "Desarrollador").all()
-    return render_template("dashboard/edit_app.html", app=app, users=developers)
+    developers = User.query.join(Role).filter(Role.name == "Desarrollador").all()
+    return render_template(
+        "dashboard/applications/edit_app.html", app=app, users=developers
+    )
 
 
+@permissions_required(["app:manage"])
 def delete_app(app_id):
     app = db.session.get(Application, app_id)
     if not app:
         abort(404)
-    if app.owner_id != current_user.id:
+
+    if app.owner_id != current_user.id and current_user.role.name != "Administrator":
         abort(403)
 
     db.session.delete(app)
     db.session.commit()
     flash("Aplicación eliminada")
     return redirect(url_for("app.dashboard"))
-
-
-def view_app(app_id):
-    app = db.session.get(Application, app_id)
-    if not app:
-        abort(404)
-    versions = (
-        Version.query.filter_by(aplicacion_id=app_id)
-        .order_by(Version.numero_version.desc())
-        .all()
-    )
-    return render_template("dashboard/view_app.html", app=app, versions=versions)

@@ -1,10 +1,19 @@
-from app.controllers import auth_controller, app_controller, version_controller
+from app.controllers import (
+    auth_controller,
+    app_controller,
+    version_controller,
+    role_controller,
+    user_controller,
+    dashboard_controller,
+)
 from flask import Blueprint
 from flask_login import login_required
 
 
 def register_routes(app):
     app_bp = Blueprint("app", __name__)
+    user_bp = Blueprint("user", __name__)
+    rol_bp = Blueprint("rol", __name__)
 
     # Version Route auth_controller
     @app_bp.route("/")
@@ -20,11 +29,18 @@ def register_routes(app):
     def logout():
         return auth_controller.logout()
 
-    # Version Route app_controller
+    # Dashboard Route dashboard_controller
     @app_bp.route("/dashboard")
     @login_required
     def dashboard():
-        return app_controller.dashboard()
+        return dashboard_controller.dashboard()
+
+    # App Route app_controller
+
+    @app_bp.route("/app")
+    @login_required
+    def app_list():
+        return app_controller.app_list()
 
     @app_bp.route("/new/app", methods=["GET", "POST"])
     @login_required
@@ -62,4 +78,58 @@ def register_routes(app):
     def delete_version(version_id):
         return version_controller.delete_version(version_id)
 
+    # Version Route role_controller
+    @rol_bp.route("/roles")
+    @login_required
+    def list_roles():
+        return role_controller.list_roles()
+
+    @rol_bp.route("/roles/new", methods=["GET", "POST"])
+    @login_required
+    def new_role():
+        return role_controller.new_role()
+
+    @rol_bp.route("/roles/<int:role_id>/edit", methods=["GET", "POST"])
+    @login_required
+    def edit_role(role_id):
+        return role_controller.edit_role(role_id)
+
+    @rol_bp.route("/roles/<int:role_id>")
+    @login_required
+    def view_role(role_id):
+        return role_controller.view_role(role_id)
+
+    @rol_bp.route("/roles/<int:role_id>/toggle_status")
+    @login_required
+    def toggle_role_status(role_id):
+        return role_controller.toggle_role_status(role_id)
+
+    # Version Route user_controller
+    @user_bp.route("/users")
+    @login_required
+    def list_users():
+        return user_controller.list_users()
+
+    @user_bp.route("/users/<int:user_id>")
+    @login_required
+    def view_user(user_id):
+        return user_controller.view_user(user_id)
+
+    @user_bp.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
+    @login_required
+    def edit_user(user_id):
+        return user_controller.edit_user(user_id)
+
+    @user_bp.route("/users/<int:user_id>/toggle_status")
+    @login_required
+    def toggle_user_status(user_id):
+        return user_controller.toggle_user_status(user_id)
+
+    @user_bp.route("/users/new", methods=["GET", "POST"])
+    @login_required
+    def new_user():
+        return user_controller.new_user()
+
     app.register_blueprint(app_bp)
+    app.register_blueprint(rol_bp)
+    app.register_blueprint(user_bp)

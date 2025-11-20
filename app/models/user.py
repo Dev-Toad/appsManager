@@ -1,36 +1,35 @@
-# app/models/user.py
-
-from app.config import (
-    db,
-    login_manager,
-)  # ← Esto YA NO causará ciclo si lo moviste en config/__init__.py
+from app.config import db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    # Use Session.get (requires SQLAlchemy >= 1.4)
     return db.session.get(User, int(user_id))
 
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-    rol_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
+    username = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(256), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    full_name = db.Column(db.String(120), nullable=True)
+    avatar_url = db.Column(db.String(256), nullable=True)
+    last_login = db.Column(db.DateTime, nullable=True)
+    role_id = db.Column(
+        db.Integer, db.ForeignKey("roles.id"), nullable=False, index=True
+    )
     is_active = db.Column(db.Boolean, default=True)
+    is_superuser = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-
-    # Relaciones
+    role = db.relationship("Role", lazy="selectin")
     owned_apps = db.relationship(
         "Application",
         foreign_keys="Application.owner_id",
         back_populates="owner",
         lazy=True,
     )
-
     owned_versions = db.relationship(
         "Version",
         foreign_keys="Version.owner_id",
@@ -43,6 +42,11 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def can(self, permission_name):
+        if self.role is not None:
+            return self.role.has_permission(permission_name)
+        return False
 
     def __repr__(self):
         return f"<User {self.username}>"
