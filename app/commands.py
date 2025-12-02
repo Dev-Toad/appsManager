@@ -5,14 +5,28 @@ import click
 
 
 def seed_roles_and_permissions():
-    """Crea roles y permisos iniciales si no existen."""
+    """Crea roles y permisos iniciales si no existen (con granularidad)."""
 
     permissions_data = {
+        # Permiso de Acceso
         "admin:access": "Permite el acceso al dashboard administrativo.",
-        "user:read": "Permite ver la información básica de usuarios.",
+        # Permisos de Usuarios (Granulares)
+        "user:read": "Permite ver la lista de usuarios.",
         "user:create": "Permite crear nuevos usuarios.",
-        "app:manage": "Permite gestionar aplicaciones y versiones.",
+        "user:edit": "Permite modificar usuarios existentes (info, rol).",
+        "user:view": "Permite ver el detalle del usuarios.",
+        "user:toggle_status": "Permite activar o desactivar usuarios.",
+        "app:read": "Permite ver la lista de aplicaciones y sus detalles.",
+        "app:create": "Permite crear nuevas aplicaciones.",
+        "app:edit": "Permite modificar aplicaciones existentes.",
+        "app:view": "Permite ver el detalle del usuario.",
+        "app:delete": "Permite eliminar aplicaciones.",
+        "version:create": "Permite crear nuevas versiones de una aplicación.",
+        "version:edit": "Permite editar versiones existentes.",
+        "version:view": "Permite ver el detalle de la version existente.",
+        "version:delete": "Permite eliminar versiones.",
         "role:manage": "Permite crear, editar y desactivar roles.",
+        "app:manage": "Permite gestionar aplicaciones y versiones",
     }
 
     permissions_objects = {}
@@ -25,15 +39,32 @@ def seed_roles_and_permissions():
             print(f"  -> Creado Permiso: {name}")
         permissions_objects[name] = permission
 
+    # Definición de Roles
+    administrator_permissions = [
+        permissions_objects["admin:access"],
+        permissions_objects["role:manage"],
+        # Permisos de Usuario
+        permissions_objects["user:read"],
+        permissions_objects["user:create"],
+        permissions_objects["user:edit"],
+        permissions_objects["user:view"],
+        permissions_objects["user:toggle_status"],
+        # Permisos de Aplicación
+        permissions_objects["app:read"],
+        permissions_objects["app:create"],
+        permissions_objects["app:edit"],
+        permissions_objects["app:view"],
+        permissions_objects["app:delete"],
+        # Permisos de Versión
+        permissions_objects["version:create"],
+        permissions_objects["version:edit"],
+        permissions_objects["version:view"],
+        permissions_objects["version:delete"],
+    ]
+
     roles_data = {
-        "Administrator": [
-            permissions_objects["admin:access"],
-            permissions_objects["user:read"],
-            permissions_objects["user:create"],
-            permissions_objects["app:manage"],
-            permissions_objects["role:manage"],
-        ],
-        "User": [permissions_objects["user:read"]],
+        "Administrator": administrator_permissions,
+        "User": [permissions_objects["user:read"], permissions_objects["app:read"]],
     }
 
     for name, required_permissions in roles_data.items():
@@ -47,6 +78,12 @@ def seed_roles_and_permissions():
             if perm not in role.permissions:
                 role.permissions.append(perm)
                 print(f"    -> Asignado {perm.name} a {name}")
+
+        if name == "Administrator":
+            obsolete_perm = permissions_objects.get("app:manage")
+            if obsolete_perm in role.permissions:
+                role.permissions.remove(obsolete_perm)
+                print(f"    -> Removido permiso LEGADO: {obsolete_perm.name} de {name}")
 
     db.session.commit()
 
@@ -63,8 +100,11 @@ def assign_admin_to_first_user():
     ):
         first_user.role_id = admin_role.id
         db.session.commit()
+        print(f"  -> Usuario {first_user.username} asignado como Administrator.")
     elif not first_user:
-        pass
+        print("  -> No se encontraron usuarios para asignar el rol de Administrador.")
+    else:
+        print(f"  -> El primer usuario ({first_user.username}) ya es Administrator.")
 
 
 def register_commands(app):
@@ -72,6 +112,8 @@ def register_commands(app):
 
     @app.cli.command("seed-db")
     def seed_db_command():
+        print("--- Iniciando Seeding de Roles y Permisos ---")
         seed_roles_and_permissions()
+        print("--- Asignando Rol de Administrador ---")
         assign_admin_to_first_user()
         click.echo("\n--- Tarea de Seeding Finalizada ---")

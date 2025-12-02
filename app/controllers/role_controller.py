@@ -7,8 +7,7 @@ from app.form.role_forms import RoleForm
 
 @permissions_required(["admin:access", "role:manage"])
 def list_roles():
-    """Muestra todos los roles."""
-    roles = Role.query.all()
+    roles = Role.query.order_by(Role.active.desc(), Role.name.asc()).all()
     return render_template(
         "dashboard/roles/list_roles.html",
         roles=roles,
@@ -45,8 +44,6 @@ def new_role():
 
 @permissions_required(["role:manage"])
 def edit_role(role_id):
-    """Formulario y lógica para editar un rol y sus permisos (usando Flask-WTF)."""
-
     role = db.session.get(Role, role_id)
     if not role:
         abort(404)

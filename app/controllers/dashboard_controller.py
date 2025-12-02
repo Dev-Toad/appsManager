@@ -7,6 +7,7 @@ from app.models.role import Role, Permission
 
 
 def dashboard():
+
     now = datetime.utcnow()
     start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     one_hour_ago = now - timedelta(hours=1)

@@ -1,9 +1,12 @@
-from flask import render_template, request, redirect, url_for, flash, abort
-from flask_login import current_user
-from app.models import Application, User, Role, Version
 from app.config import db
-from datetime import datetime
+from flask import render_template, redirect, url_for, flash, abort
+from flask_login import current_user
+from app.models import Version
+from app.models.application import Application
+from sqlalchemy.exc import IntegrityError
+
 from app.decorators import permissions_required
+from app.form.aplication_form import EditApplicationForm, CreateApplicationForm
 
 
 def app_list():
@@ -11,14 +14,15 @@ def app_list():
     return render_template("dashboard/applications/applications.html", apps=apps)
 
 
+@permissions_required(["app:read"])
 def view_app(app_id):
     """Muestra los detalles de una aplicación y sus versiones."""
     app = db.session.get(Application, app_id)
     if not app:
         abort(404)
     versions = (
-        Version.query.filter_by(aplicacion_id=app_id)
-        .order_by(Version.numero_version.desc())
+        Version.query.filter_by(application_id=app_id)
+        .order_by(Version.version_number.desc())
         .all()
     )
     return render_template(
@@ -26,155 +30,68 @@ def view_app(app_id):
     )
 
 
-@permissions_required(["app:manage"])
+@permissions_required(["app:create"])
 def new_app():
-    """Permite crear una nueva aplicación. Requiere el permiso app:manage."""
-    if request.method == "POST":
-        nombre = request.form.get("nombre")
-        if not nombre:
-            flash("El campo 'nombre' es requerido")
-            return redirect(url_for("app.new_app"))
+    form = CreateApplicationForm()
 
-        descripcion = request.form.get("descripcion")
-        tipo = request.form.get("tipo")
-        stack = request.form.get("stack")
-        framework = request.form.get("framework")
-        repositorio_url = request.form.get("repositorio_url")
-        estado = request.form.get("estado", "Activa")
-        fecha_creacion_raw = request.form.get("fecha_creacion")
-        owner_id_raw = request.form.get("owner_id")
-        tipo_entorno = request.form.get("tipo_entorno", "servidor")
-        version_docker = (
-            request.form.get("version_docker") if tipo_entorno == "docker" else None
-        )
-
+    if form.validate_on_submit():
         try:
-            owner_id = int(owner_id_raw)
-        except (TypeError, ValueError):
-            flash("Owner inválido")
-            return redirect(url_for("app.new_app"))
 
-        fecha_creacion = None
-        if fecha_creacion_raw:
-            try:
-                fecha_creacion = datetime.fromisoformat(fecha_creacion_raw).date()
-            except ValueError:
-                try:
-                    fecha_creacion = datetime.strptime(
-                        fecha_creacion_raw, "%Y-%m-%d"
-                    ).date()
-                except Exception:
-                    flash("Formato de fecha inválido")
-                    return redirect(url_for("app.new_app"))
+            new_app = Application(
+                nombre=form.nombre.data,
+                descripcion=form.descripcion.data,
+                repositorio_url=form.repositorio_url.data or None,
+                version_docker=form.version_docker.data or None,
+                estado=form.estado.data,
+                tipo_entorno=form.tipo_entorno.data,
+                application_type=form.application_type.data,
+                stack_obj=form.stack_obj.data,
+                framework_obj=form.framework_obj.data,
+                owner=current_user,
+            )
 
-        owner = (
-            User.query.join(Role)
-            .filter(User.id == owner_id, Role.name == "Desarrollador")
-            .first()
-        )
-        if not owner:
-            flash("Usuario dueño no válido o no es Desarrollador")
-            return redirect(url_for("app.new_app"))
-
-        app = Application(
-            nombre=nombre,
-            descripcion=descripcion,
-            tipo=tipo,
-            stack=stack,
-            framework=framework,
-            repositorio_url=repositorio_url,
-            estado=estado,
-            fecha_creacion=fecha_creacion,
-            owner_id=owner_id,
-            tipo_entorno=tipo_entorno,
-            version_docker=version_docker,
-        )
-        db.session.add(app)
-        try:
+            db.session.add(new_app)
             db.session.commit()
+
+            flash("Aplicación creada exitosamente.", "success")
+            return redirect(url_for("app.view_app", app_id=new_app.id))
+
+        except IntegrityError:
+            db.session.rollback()
+            flash("Error de integridad: Probablemente el nombre ya existe.", "danger")
         except Exception as e:
             db.session.rollback()
-            flash(f"Error al guardar la aplicación: {e}")
-            return redirect(url_for("app.new_app"))
+            flash(f"Error al crear la aplicación: {str(e)}", "danger")
 
-        flash("Aplicación creada con éxito")
-        return redirect(url_for("app.dashboard"))
-
-    developers = User.query.join(Role).filter(Role.name == "Desarrollador").all()
-    return render_template("dashboard/applications/new_app.html", users=developers)
+    return render_template("dashboard/applications/new_app.html", form=form)
 
 
-@permissions_required(["app:manage"])
+@permissions_required(["app:edit"])
 def edit_app(app_id):
-    app = db.session.get(Application, app_id)
-    if not app:
+    app_obj = db.session.get(Application, app_id)
+    if not app_obj:
         abort(404)
 
-    if app.owner_id != current_user.id and current_user.role.name != "Administrator":
-        abort(403)
+    form = EditApplicationForm(obj=app_obj, application_id=app_id)
 
-    if request.method == "POST":
-        nombre = request.form.get("nombre")
-        if not nombre:
-            flash("El campo 'nombre' es requerido")
-            return redirect(url_for("app.edit_app", app_id=app_id))
-
-        app.nombre = nombre
-        app.descripcion = request.form.get("descripcion")
-        app.tipo = request.form.get("tipo")
-        app.stack = request.form.get("stack")
-        app.framework = request.form.get("framework")
-        app.repositorio_url = request.form.get("repositorio_url")
-        app.estado = request.form.get("estado", "Activa")
-
-        fecha_creacion_raw = request.form.get("fecha_creacion")
-        if fecha_creacion_raw:
-            try:
-                app.fecha_creacion = datetime.fromisoformat(fecha_creacion_raw).date()
-            except ValueError:
-                try:
-                    app.fecha_creacion = datetime.strptime(
-                        fecha_creacion_raw, "%Y-%m-%d"
-                    ).date()
-                except Exception:
-                    flash("Formato de fecha inválido")
-                    return redirect(url_for("app.edit_app", app_id=app_id))
-
-        owner_id_raw = request.form.get("owner_id")
+    if form.validate_on_submit():
         try:
-            owner_id = int(owner_id_raw)
-        except (TypeError, ValueError):
-            flash("Owner inválido")
-            return redirect(url_for("app.edit_app", app_id=app_id))
-
-        owner = (
-            User.query.join(Role)
-            .filter(User.id == owner_id, Role.name == "Desarrollador")
-            .first()
-        )
-        if not owner:
-            flash("Usuario dueño no válido o no es Desarrollador")
-            return redirect(url_for("app.edit_app", app_id=app_id))
-
-        app.owner_id = owner_id
-
-        try:
+            form.populate_obj(app_obj)
             db.session.commit()
+
+            flash("Aplicación actualizada con éxito", "success")
+            return redirect(url_for("app.app_list"))
+
         except Exception as e:
             db.session.rollback()
-            flash(f"Error al actualizar la aplicación: {e}")
-            return redirect(url_for("app.edit_app", app_id=app_id))
+            flash(f"Error al actualizar: {e}", "danger")
 
-        flash("Aplicación actualizada con éxito")
-        return redirect(url_for("app.dashboard"))
-
-    developers = User.query.join(Role).filter(Role.name == "Desarrollador").all()
     return render_template(
-        "dashboard/applications/edit_app.html", app=app, users=developers
+        "dashboard/applications/edit_app.html", app=app_obj, form=form
     )
 
 
-@permissions_required(["app:manage"])
+@permissions_required(["app:delete"])
 def delete_app(app_id):
     app = db.session.get(Application, app_id)
     if not app:

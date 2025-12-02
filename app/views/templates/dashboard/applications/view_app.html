@@ -1,115 +1,422 @@
 {% extends "base.html" %}
 
-{% block title %}{{ app.nombre }}{% endblock %}
+{% block title %}{{ app.name }}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <div class="mb-6">
-        <a href="{{ url_for('app.dashboard') }}" class="text-blue-600 hover:underline flex items-center">
-            ← Volver al Dashboard
-        </a>
-    </div>
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">{{ app.nombre }}</h1>
-        <div class="space-x-2">
-            <a href="{{ url_for('app.edit_app', app_id=app.id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">Editar App</a>
-            <a href="{{ url_for('app.new_version', app_id=app.id) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">+ Nueva Versión</a>
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
+        
+        <!-- Botones de Acción Superiores -->
+        <div class="flex flex-wrap gap-3 mb-6">
+            <a href="{{ url_for('app.app_list') }}" 
+               class="inline-flex items-center bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-semibold transition-all duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Volver al Listado de Aplicaciones
+            </a>
+            <a href="{{ url_for('app.edit_app', app_id=app.id) }}" 
+               class="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Editar App
+            </a>
+            <a href="{{ url_for('app.new_version', app_id=app.id) }}" 
+               class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Nueva Versión
+            </a>
         </div>
-    </div>
 
-    <div class="bg-white rounded-lg shadow p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-                <strong>Descripción:</strong>
-                <p>{{ app.descripcion or 'Sin descripción' }}</p>
-            </div>
-            <div>
-                <strong>Repositorio:</strong>
-                <p>
-                    {% if app.repositorio_url %}
-                        <a href="{{ app.repositorio_url }}" target="_blank" class="text-blue-600 underline">{{ app.repositorio_url }}</a>
-                    {% else %}
-                        No disponible
-                    {% endif %}
-                </p>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div><strong>Tipo:</strong> {{ app.tipo or '-' }}</div>
-            <div><strong>Stack:</strong> {{ app.stack or '-' }}</div>
-            <div><strong>Framework:</strong> {{ app.framework or '-' }}</div>
-            <div><strong>Dueño:</strong> {{ app.owner.username }} ({{ app.owner.role.nombre }})</div>
-            <div><strong>Estado:</strong> {{ app.estado }}</div>
-            <div><strong>Tipo Entorno:</strong> {{ app.tipo_entorno|title }}</div>
-            {% if app.tipo_entorno == 'docker' and app.version_docker %}
-            <div><strong>Versión Docker:</strong> {{ app.version_docker }}</div>
-            {% endif %}
-            <div><strong>Creada:</strong> {{ app.fecha_creacion.strftime('%d/%m/%Y') if app.fecha_creacion else '-' }}</div>
-        </div>
-    </div>
-
-    <h2 class="text-2xl font-semibold mb-4">Versiones</h2>
-
-    {% if versions|length == 0 %}
-        <div class="bg-gray-100 p-4 rounded mb-6">
-            No hay versiones. <a href="{{ url_for('app.new_version', app_id=app.id) }}" class="text-blue-600 underline">Crear primera versión</a>.
-        </div>
-    {% else %}
-        <div class="space-y-4">
-            {% for version in versions %}
-            <div class="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-                <div class="flex justify-between items-start">
+        <!-- Card Principal de Información -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+            
+            <!-- Header del Card -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+                <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-xl font-bold">{{ version.numero_version }} - {{ version.titulo }}</h3>
-                        <p class="text-gray-600 text-sm mt-1">{{ version.descripcion or 'Sin descripción' }}</p>
-                        
-                        <!-- Documentación -->
-                        <p class="text-xs text-gray-500 mt-2">
-                            {% if version.documentacion_url %}
-                                📄 <a href="{{ version.documentacion_url }}" target="_blank" class="text-blue-600 hover:underline">Ver documentación</a>
-                            {% else %}
-                                📄 Documentación no disponible
-                            {% endif %}
-                        </p>
+                        <!-- CAMBIO: app.nombre -> app.name -->
+                        <h1 class="text-3xl font-bold text-white">{{ app.nombre }}</h1>
+                        <p class="text-blue-100 mt-1">Información general de la aplicación</p>
+                    </div>
+                    <!-- Badge de Estado -->
+                    {% if app.estado == 'Activa' %}
+                        <span class="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full font-semibold text-sm shadow-lg">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            {{ app.estado }}
+                        </span>
+                    {% else %}
+                        <span class="inline-flex items-center bg-gray-500 text-white px-4 py-2 rounded-full font-semibold text-sm shadow-lg">
+                            {{ app.estado }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
 
-                        <!-- SO Compatible -->
-                        <p class="text-xs text-gray-500 mt-1">
-                            {% if version.so_compatibles %}
-                                🖥️ SO: 
-                                {% for so in version.so_compatibles %}
-                                    {{ so.nombre_so }}{% if not loop.last %}, {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                🖥️ SO: No definido
-                            {% endif %}
-                        </p>
+            <!-- Contenido del Card -->
+            <div class="p-8">
+                
+                <!-- Sección: Información General -->
+                <div class="mb-8">
+                    <div class="flex items-center mb-6 pb-2 border-b-2 border-blue-500">
+                        <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-800">Información General</h2>
+                    </div>
 
-                        <!-- Soporte -->
-                        <p class="text-xs text-gray-500 mt-1">
-                            📅 Soporte: 
-                            {% if version.fecha_fin_soporte %}
-                                {{ version.fecha_inicio_soporte.strftime('%d/%m/%Y') if version.fecha_inicio_soporte else 'N/A' }} - 
-                                {{ version.fecha_fin_soporte.strftime('%d/%m/%Y') }}
-                            {% else %}
-                                <span class="text-green-600 font-medium">Activa</span>
-                            {% endif %}
-                        </p>
+                    <!-- Grid de información -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Descripción -->
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200 md:col-span-2">
+                            <div class="flex items-start">
+                                <div class="bg-purple-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Descripción</p>
+                                    <!-- CAMBIO: app.descripcion -> app.description -->
+                                    <p class="text-base text-gray-900 leading-relaxed">{{ app.descripcion or 'Sin descripción' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Repositorio -->
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200 md:col-span-2">
+                            <div class="flex items-start">
+                                <div class="bg-indigo-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Repositorio</p>
+                                    <!-- CAMBIO: app.repositorio_url -> app.repository_url -->
+                                    {% if app.repositorio_url %}
+                                        <a href="{{ app.repositorio_url }}" target="_blank" 
+                                           class="text-base text-blue-600 hover:text-blue-700 hover:underline font-medium break-all">
+                                            {{ app.repositorio_url }}
+                                        </a>
+                                    {% else %}
+                                        <p class="text-base text-gray-500">No disponible</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tipo -->
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-blue-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Tipo</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ app.application_type.name or 'No definido' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stack -->
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-green-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Stack</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ app.stack_obj.name or 'No definido' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Framework -->
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-orange-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Framework</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ app.framework_obj.name or 'No definido' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tipo Entorno -->
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-teal-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Tipo Entorno</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ app.tipo_entorno|title }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Versión Docker (condicional) -->
+                        {% if app.tipo_entorno == 'docker' and app.version_docker %}
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-cyan-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Versión Docker</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ app.version_docker }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
 
                         <!-- Dueño -->
-                        <p class="text-xs text-gray-500 mt-1">
-                            👤 Dueño: {{ version.release_owner.username }}
-                        </p>
-                    </div>
-                    <div class="flex space-x-2">
-                        <a href="{{ url_for('app.edit_version', version_id=version.id) }}" class="text-yellow-600 hover:underline text-sm">Editar</a>
-                        <form method="POST" action="{{ url_for('app.delete_version', version_id=version.id) }}" class="inline" onsubmit="return confirm('¿Eliminar versión?')">
-                            <button type="submit" class="text-red-600 hover:underline text-sm">Eliminar</button>
-                        </form>
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-pink-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Dueño</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ app.owner.username }}</p>
+                                    <p class="text-sm text-gray-600">({{ app.owner.role.name }})</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fecha de Creación -->
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-indigo-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Fecha de Creación</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ app.created_at.strftime('%d/%m/%Y') if app.created_at else 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
-    {% endif %}
+
+        <!-- Sección: Versiones -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg class="w-7 h-7 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                        <h2 class="text-2xl font-bold text-white">Versiones</h2>
+                    </div>
+                    <span class="bg-purple-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg">
+                        {{ versions|length }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="p-8">
+                {% if versions|length == 0 %}
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-r-lg">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-yellow-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <p class="text-yellow-700 font-medium">No hay versiones registradas.</p>
+                                <a href="{{ url_for('app.new_version', app_id=app.id) }}" class="text-yellow-800 underline hover:text-yellow-900 font-semibold">
+                                    Crear primera versión
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="space-y-4">
+                        {% for version in versions %}
+                        <div class="bg-white border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-lg transition-all duration-200">
+                            <div class="p-6">
+                                <!-- Header de la versión -->
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <h3 class="text-xl font-bold text-gray-900">{{ version.version_number }}</h3>
+                                            <span class="text-gray-400">-</span>
+                                            <!-- CAMBIO: version.titulo -> version.title -->
+                                            <h4 class="text-xl font-semibold text-gray-700">{{ version.title }}</h4>
+                                        </div>
+                                        <!-- CAMBIO: version.descripcion -> version.description -->
+                                        <p class="text-gray-600 text-sm leading-relaxed">{{ version.description or 'Sin descripción' }}</p>
+                                    </div>
+                                    <div class="flex gap-2 ml-4">
+                                        <a href="{{ url_for('app.edit_version', version_id=version.id) }}" 
+                                           class="inline-flex items-center bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-4 py-2 rounded-lg font-semibold text-sm transition-colors">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                            Editar
+                                        </a>
+                                        <!-- NOTE: Se mantiene la función JS `confirm` ya que es una función de demostración, aunque se recomienda usar modales personalizados. -->
+                                        <form method="POST" action="{{ url_for('app.delete_version', version_id=version.id) }}" class="inline" onsubmit="return confirm('¿Está seguro de que desea eliminar esta versión?')">
+                                            <button type="submit" 
+                                                    class="inline-flex items-center bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg font-semibold text-sm transition-colors">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Detalles de la versión -->
+                                <div class="border-t border-gray-200 pt-4 mt-4">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        <!-- Documentación -->
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 mr-3">
+                                                <div class="bg-blue-100 rounded-lg p-2">
+                                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 font-medium mb-1">Documentación</p>
+                                                <!-- CAMBIO: version.documentacion_url -> version.documentacion_url -->
+                                                {% if version.documentacion_url %}
+                                                    <a href="{{ version.documentacion_url }}" target="_blank" 
+                                                       class="text-sm text-blue-600 hover:text-blue-700 hover:underline font-medium">
+                                                        Ver docs
+                                                    </a>
+                                                {% else %}
+                                                    <p class="text-sm text-gray-500">No disponible</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- SO Compatible -->
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 mr-3">
+                                                <div class="bg-green-100 rounded-lg p-2">
+                                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 font-medium mb-1">Sistema Operativo</p>
+                                                {% if version.so_compatibles %}
+                                                    <p class="text-sm text-gray-900 font-medium">
+                                                        <!-- CAMBIO: so.nombre_so -> so.name (Asumiendo el refactor del modelo SO) -->
+                                                        {% for so in version.so_compatibles %}
+                                                            {{ so.name }}{% if not loop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </p>
+                                                {% else %}
+                                                    <p class="text-sm text-gray-500">No definido</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- Soporte -->
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 mr-3">
+                                                <div class="bg-purple-100 rounded-lg p-2">
+                                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 font-medium mb-1">Soporte</p>
+                                                <!-- CAMBIO: version.fecha_fin_soporte -> version.support_end_date -->
+                                                {% if version.support_end_date %}
+                                                    <p class="text-sm text-gray-900 font-medium">
+                                                        <!-- CAMBIO: version.fecha_inicio_soporte -> version.support_start_date -->
+                                                        {{ version.support_start_date.strftime('%d/%m/%Y') if version.support_start_date else 'N/A' }} - 
+                                                        {{ version.support_end_date.strftime('%d/%m/%Y') }}
+                                                    </p>
+                                                {% else %}
+                                                    <span class="inline-flex items-center text-sm text-green-600 font-bold">
+                                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                        Activa
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- Dueño -->
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 mr-3">
+                                                <div class="bg-pink-100 rounded-lg p-2">
+                                                    <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 font-medium mb-1">Dueño</p>
+                                                <p class="text-sm text-gray-900 font-medium">{{ version.release_owner.username }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Footer del Card -->
+            <div class="bg-gray-50 px-8 py-4 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p class="text-sm text-gray-600">
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        ID de la Aplicación: <span class="font-mono font-semibold">{{ app.id }}</span>
+                    </p>
+                    <div class="flex gap-3">
+                        <a href="{{ url_for('app.new_version', app_id=app.id) }}" 
+                           class="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">
+                            Crear nueva versión
+                        </a>
+                        <span class="text-gray-300">|</span>
+                        <a href="{{ url_for('app.edit_app', app_id=app.id) }}" 
+                           class="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">
+                            Editar aplicación
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

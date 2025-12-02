@@ -5,11 +5,10 @@ from app.models.user import User
 from app.models.role import Role
 from app.decorators import permissions_required
 from sqlalchemy.orm import joinedload
-from app.form.user_form import UserForm
+from app.form.user_form import CreateUserForm, EditUserForm
 
 
-@permissions_required(["admin:access", "user:read"])
-# revisar @permissions_required(['admin:access', 'user:view_all'])
+@permissions_required(["user:read"])
 def list_users():
     """Muestra la lista de todos los usuarios, cargando roles de forma eficiente."""
     users = (
@@ -28,9 +27,8 @@ def list_users():
 
 @permissions_required(["admin:access", "user:create"])
 def new_user():
-    """Maneja la creación de nuevos usuarios usando Flask-WTF."""
 
-    form = UserForm()
+    form = CreateUserForm()
 
     if form.validate_on_submit():
         username = form.username.data
@@ -62,7 +60,7 @@ def new_user():
     )
 
 
-@permissions_required(["admin:access", "user:read"])
+@permissions_required(["admin:access", "user:view"])
 def view_user(user_id):
     user = (
         db.session.execute(
@@ -80,16 +78,14 @@ def view_user(user_id):
     )
 
 
-@permissions_required(["admin:access"])
+@permissions_required(["admin:access", "user:edit"])
 def edit_user(user_id):
-    """
-    Maneja la edición de un usuario existente.
-    """
     user = db.session.get(User, user_id)
     if not user:
         abort(404)
 
-    form = UserForm(obj=user)
+    form = EditUserForm(obj=user)
+
     if form.validate_on_submit():
 
         new_username = form.username.data
@@ -108,17 +104,21 @@ def edit_user(user_id):
             flash(f"Usuario '{user.username}' actualizado con éxito.", "success")
             return redirect(url_for("user.list_users"))
 
-        except Exception:
+        except Exception as e:
             db.session.rollback()
             error_code = 500
-            flash(f"Error {error_code} al actualizar usuario", "danger", "")
+            print(f"Error al actualizar usuario: {e}")
+            flash(
+                f"Error {error_code} al actualizar usuario. Inténtalo de nuevo.",
+                "danger",
+            )
 
     return render_template(
         "dashboard/users/edit_user.html", user=user, form=form, active_page="users"
     )
 
 
-@permissions_required(["admin:access", "user:toggle_active"])
+@permissions_required(["admin:access", "user:toggle_status"])
 def toggle_user_status(user_id):
     """Activa o desactiva la cuenta de un usuario."""
     user = db.session.get(User, user_id)

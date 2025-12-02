@@ -74,4 +74,3 @@ PYTHONPATH=. lardin/bin/pytest -q
 
 ## Notas
 - El proyecto incluye un virtualenv `lardin` para desarrollo local.
-- Si necesitas que monte bases de datos o variables de entorno, dime y añado un ejemplo `.env` y la documentación correspondiente.

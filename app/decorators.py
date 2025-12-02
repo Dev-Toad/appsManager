@@ -5,7 +5,7 @@ from flask_login import current_user
 
 def roles_required(role_names):
     """Restringe el acceso si el rol del usuario no está en la lista."""
-    # ... (el resto de tu código para roles_required) ...
+
     if not isinstance(role_names, (list, tuple)):
         role_names = [role_names]
 
@@ -30,9 +30,11 @@ def roles_required(role_names):
 def permissions_required(permission_names):
     """
     Restringe el acceso a la ruta.
-    Utiliza el método can() del modelo User, respetando la lógica de Superusuario.
+
+    Implementa lógica OR: El usuario necesita tener AL MENOS UNO de los permisos
+    listados para obtener acceso.
     """
-    # ... (el resto de tu código para permissions_required) ...
+
     if not isinstance(permission_names, (list, tuple)):
         permission_names = [permission_names]
 
@@ -44,9 +46,15 @@ def permissions_required(permission_names):
                     url_for(current_app.config.get("LOGIN_VIEW", "auth.login"))
                 )
 
-            for required_perm in permission_names:
-                if not current_user.can(required_perm):
-                    abort(403)
+            # --- Lógica OR implementada aquí ---
+            # Comprueba si el usuario tiene *cualquiera* de los permisos.
+            # current_user.can(perm) devuelve True o False.
+            # La función 'any()' devuelve True si AL MENOS UNO de los resultados es True.
+
+            has_permission = any(current_user.can(perm) for perm in permission_names)
+
+            if not has_permission:
+                abort(403)
 
             return f(*args, **kwargs)
 

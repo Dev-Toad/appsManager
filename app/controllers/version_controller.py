@@ -1,107 +1,120 @@
-from flask import render_template, request, redirect, url_for, flash, abort
+from flask import render_template, redirect, url_for, flash, abort
 from flask_login import current_user
-from app.models import Version, Application, User, Role
+from app.models import Version, Application
 from app.config import db
 from app.decorators import permissions_required
+from app.form.version_form import CreateVersionForm, EditVersionForm
+from sqlalchemy.exc import IntegrityError
 
 
-@permissions_required(["app:manage"])
+@permissions_required(["version:create"])
 def new_version(app_id):
-    """Permite crear una nueva versión de una aplicación."""
-    app = db.session.get(Application, app_id)
-    if not app:
-        abort(404)
+    """Crea una nueva versión para una aplicación."""
+    app_instance = db.session.get(Application, app_id)
+    if not app_instance:
+        flash("Aplicación no encontrada.", "danger")
+        return redirect(url_for("app.app_list"))
 
-    if app.owner_id != current_user.id and current_user.role.name != "Administrator":
-        abort(403)
+    form = CreateVersionForm()
 
-    if request.method == "POST":
-        numero_version = request.form["numero_version"]
-        titulo = request.form["titulo"]
-        descripcion = request.form["descripcion"]
-        documentacion_url = request.form["documentacion_url"]
-        gestor_bd = request.form["gestor_bd"]
-        version_gestor_bd = request.form["version_gestor_bd"]
-        dependencias = request.form["dependencias"]
-        fecha_inicio_soporte = request.form.get("fecha_inicio_soporte")
-        fecha_fin_soporte = request.form.get("fecha_fin_soporte")
-        owner_id = request.form["owner_id"]
-        owner = (
-            User.query.join(Role)
-            .filter(User.id == owner_id, Role.name == "Desarrollador")
-            .first()
-        )
-        if not owner:
-            flash("Usuario dueño no válido o no es Desarrollador")
-            return redirect(url_for("version.new_version", app_id=app_id))
+    if form.validate_on_submit():
+        try:
+            new_version = Version(
+                version_number=form.version_number.data,
+                title=form.title.data,
+                description=form.description.data or None,
+                documentacion_url=form.documentacion_url.data or None,
+                db_manager=form.db_manager.data or None,
+                db_manager_version=form.db_manager_version.data or None,
+                dependencias=form.dependencias.data or None,
+                support_start_date=form.support_start_date.data,
+                support_end_date=form.support_end_date.data,
+                release_owner=current_user,
+                application_id=app_id,
+            )
 
-        version = Version(
-            aplicacion_id=app_id,
-            numero_version=numero_version,
-            titulo=titulo,
-            descripcion=descripcion,
-            documentacion_url=documentacion_url,
-            gestor_bd=gestor_bd,
-            version_gestor_bd=version_gestor_bd,
-            dependencias=dependencias,
-            fecha_inicio_soporte=fecha_inicio_soporte,
-            fecha_fin_soporte=fecha_fin_soporte,
-            owner_id=owner_id,
-        )
-        db.session.add(version)
-        db.session.commit()
-        flash("Versión creada con éxito")
-        return redirect(url_for("app.view_app", app_id=app_id))
+            db.session.add(new_version)
+            db.session.commit()
 
-    developers = User.query.join(Role).filter(Role.name == "Desarrollador").all()
+            flash(
+                f"Versión {new_version.version_number} creada exitosamente.",
+                "success",
+            )
+            return redirect(url_for("app.view_app", app_id=app_id))
+
+        except IntegrityError:
+            db.session.rollback()
+            flash("Ya existe una versión con ese número.", "danger")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error al crear la versión: {str(e)}", "danger")
+
     return render_template(
-        "dashboard/version/new_version.html", app=app, users=developers
+        "dashboard/version/new_version.html", form=form, app=app_instance
     )
 
 
-@permissions_required(["app:manage"])
+@permissions_required(["version:edit"])
 def edit_version(version_id):
+    """
+    Controlador para editar una versión de aplicación existente.
+    Carga la Versión y su Aplicación asociada para el contexto de la plantilla.
+    """
+
     version = db.session.get(Version, version_id)
-    if not version:
-        abort(404)
 
-    if (
-        version.release_owner.id != current_user.id
-        and current_user.role.name != "Administrator"
-    ):
-        abort(403)
+    if version is None:
+        flash("La versión solicitada no fue encontrada.", "error")
+        return redirect(url_for("index"))
 
-    if request.method == "POST":
-        version.titulo = request.form["titulo"]
-        version.descripcion = request.form["descripcion"]
-        version.documentacion_url = request.form["documentacion_url"]
-        version.gestor_bd = request.form["gestor_bd"]
-        version.version_gestor_bd = request.form["version_gestor_bd"]
-        version.dependencias = request.form["dependencias"]
-        version.fecha_inicio_soporte = request.form.get("fecha_inicio_soporte")
-        version.fecha_fin_soporte = request.form.get("fecha_fin_soporte")
-        version.owner_id = request.form["owner_id"]
+    app_instance = version.application
 
-        owner = (
-            User.query.join(Role)
-            .filter(User.id == version.owner_id, Role.name == "Desarrollador")
-            .first()
-        )
-        if not owner:
-            flash("Usuario dueño no válido o no es Desarrollador")
-            return redirect(url_for("version.edit_version", version_id=version_id))
+    if app_instance is None:
+        flash("No se pudo encontrar la aplicación asociada a esta versión.", "error")
+        return redirect(url_for("index"))
 
-        db.session.commit()
-        flash("Versión actualizada")
-        return redirect(url_for("app.view_app", app_id=version.aplicacion_id))
+    form = EditVersionForm(obj=version)
 
-    developers = User.query.join(Role).filter(Role.name == "Desarrollador").all()
+    if form.validate_on_submit():
+        try:
+            version.version_number = form.version_number.data
+            version.title = form.title.data
+            version.description = form.description.data
+            version.documentacion_url = form.documentacion_url.data
+            version.db_manager = form.db_manager.data
+            version.db_manager_version = form.db_manager_version.data
+            version.dependencias = form.dependencias.data
+            version.support_start_date = form.support_start_date.data
+            version.support_end_date = form.support_end_date.data
+
+            db.session.commit()
+            flash(
+                f"La Versión {version.version_number} de {app_instance.nombre}"
+                "ha sido actualizada.",
+                "success",
+            )
+
+            return redirect(url_for("app.view_app", app_id=app_instance.id))
+
+        except IntegrityError:
+            db.session.rollback()
+            flash(
+                "Error: El número de versión ya existe para esta aplicación.", "error"
+            )
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error al guardar los cambios: {str(e)}", "error")
+
     return render_template(
-        "dashboard/version/edit_version.html", version=version, users=developers
+        "dashboard/version/edit_version.html",
+        title=f"Editar Versión {version.version_number}",
+        form=form,
+        version=version,
+        app=app_instance,
     )
 
 
-@permissions_required(["app:manage"])
+@permissions_required(["version:delete"])
 def delete_version(version_id):
     """Permite eliminar una versión existente."""
     version = db.session.get(Version, version_id)
@@ -114,7 +127,7 @@ def delete_version(version_id):
     ):
         abort(403)
 
-    app_id = version.aplicacion_id
+    app_id = version.application
     db.session.delete(version)
     db.session.commit()
     flash("Versión eliminada")

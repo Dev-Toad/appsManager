@@ -1,29 +1,35 @@
 from app.config import db
-from datetime import datetime
+from sqlalchemy.sql import func
 
 
 class Version(db.Model):
-    __tablename__ = "versiones"
+    __tablename__ = "versions"
     id = db.Column(db.Integer, primary_key=True)
-    aplicacion_id = db.Column(
-        db.Integer, db.ForeignKey("aplicaciones.id"), nullable=False
-    )
-    numero_version = db.Column(db.String(50), nullable=False)
-    titulo = db.Column(db.String(100), nullable=False)
-    descripcion = db.Column(db.Text)
-    documentacion_url = db.Column(db.String(255))
-    gestor_bd = db.Column(db.String(50))
-    version_gestor_bd = db.Column(db.String(50))
-    dependencias = db.Column(db.Text)
-    fecha_inicio_soporte = db.Column(db.Date)
-    fecha_fin_soporte = db.Column(db.Date)
-    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+
+    application_id = db.Column(
+        db.Integer, db.ForeignKey("aplicaciones.id"), nullable=False, index=True
     )
 
-    # Relaciones - ✅ Todo con back_populates
+    version_number = db.Column(db.String(50), nullable=False, index=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    documentacion_url = db.Column(db.String(255))
+
+    db_manager = db.Column(db.String(50))
+    db_manager_version = db.Column(db.String(50))
+
+    dependencias = db.Column(db.Text)
+
+    support_start_date = db.Column(db.Date)
+    support_end_date = db.Column(db.Date)
+
+    owner_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
+
+    created_at = db.Column(db.DateTime, default=func.now())
+    updated_at = db.Column(db.DateTime, default=func.now(), onupdate=func.now())
+
     application = db.relationship("Application", back_populates="versions", lazy=True)
     release_owner = db.relationship("User", back_populates="owned_versions", lazy=True)
     so_compatibles = db.relationship(
@@ -34,4 +40,4 @@ class Version(db.Model):
     )
 
     def __repr__(self):
-        return f"<Version {self.numero_version} of App {self.aplicacion_id}>"
+        return f"<Version {self.version_number} of App {self.application_id}>"
