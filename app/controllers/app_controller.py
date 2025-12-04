@@ -1,8 +1,8 @@
 from app.config import db
-from flask import render_template, redirect, url_for, flash, abort
+from flask import render_template, redirect, url_for, flash, abort, request
 from flask_login import current_user
 from app.models import Version
-from app.models.application import Application
+from app.models.application import Application, ApplicationType
 from sqlalchemy.exc import IntegrityError
 
 from app.decorators import permissions_required
@@ -10,8 +10,31 @@ from app.form.aplication_form import EditApplicationForm, CreateApplicationForm
 
 
 def app_list():
-    apps = Application.query.all()
-    return render_template("dashboard/applications/applications.html", apps=apps)
+
+    search_query = request.args.get("q", "").strip()
+    filter_type = request.args.get("type", "").strip()
+
+    query = Application.query
+
+    if search_query:
+        query = query.filter(Application.nombre.ilike(f"%{search_query}%"))
+
+    if filter_type:
+        query = query.join(Application.application_type).filter(
+            ApplicationType.name == filter_type
+        )
+
+    apps = query.order_by(Application.nombre).all()
+
+    app_types = ApplicationType.query.order_by(ApplicationType.name).all()
+
+    return render_template(
+        "dashboard/applications/applications.html",
+        apps=apps,
+        search_query=search_query,
+        filter_type=filter_type,
+        app_types=app_types,
+    )
 
 
 @permissions_required(["app:read"])
