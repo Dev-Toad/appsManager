@@ -78,6 +78,10 @@ def register_routes(app):
     def delete_version(version_id):
         return version_controller.delete_version(version_id)
 
+    @app_bp.route("/version/<int:version_id>/download/<file_type>")
+    def download_version_file_route(version_id, file_type):
+        return version_controller.download_version_file(version_id, file_type)
+
     # 🏗️ Rutas de Frameworks (frameworks_controller)
     @app_bp.route("/frameworks-by-stack/<int:stack_id>")
     @login_required

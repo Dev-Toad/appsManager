@@ -1,6 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, DateField
+from wtforms import (
+    StringField,
+    SubmitField,
+    TextAreaField,
+    DateField,
+    RadioField,
+)
 from wtforms.validators import DataRequired, Optional, Length, ValidationError, URL
+from flask_wtf.file import FileField, FileAllowed
 from app.models import Role, User, Version
 from app.config import db
 
@@ -16,19 +23,19 @@ class BaseVersionForm(FlaskForm):
             DataRequired(message="El número de versión es obligatorio"),
             Length(max=50),
         ],
-        render_kw={"placeholder": "v1.0.0"},
     )
 
     title = StringField(
-        "Título",
-        validators=[DataRequired(message="El título es obligatorio"), Length(max=100)],
-        render_kw={"placeholder": "Título descriptivo de la versión"},
+        "Título de la Versión",
+        validators=[
+            DataRequired(message="El título es obligatorio"),
+            Length(max=100),
+        ],
     )
 
     description = TextAreaField(
         "Descripción",
         validators=[Optional()],
-        render_kw={"placeholder": "Descripción detallada de los cambios"},
     )
 
     documentacion_url = StringField(
@@ -38,39 +45,60 @@ class BaseVersionForm(FlaskForm):
             URL(message="Debe ser una URL válida"),
             Length(max=255),
         ],
-        render_kw={"placeholder": "https://docs.ejemplo.com/v1.0.0"},
     )
 
     db_manager = StringField(
         "Gestor de Base de Datos",
         validators=[Optional(), Length(max=50)],
-        render_kw={"placeholder": "PostgreSQL, MySQL, MongoDB..."},
     )
 
     db_manager_version = StringField(
-        "Versión del Gestor",
+        "Versión del Gestor de BD",
         validators=[Optional(), Length(max=50)],
-        render_kw={"placeholder": "14.5, 8.0, 5.0..."},
     )
 
     dependencias = TextAreaField(
         "Dependencias",
         validators=[Optional()],
-        render_kw={"placeholder": "requests==2.28.1\nflask==2.3.0\npandas>=1.5.0"},
     )
 
     support_start_date = DateField(
-        "Fecha de Inicio de Soporte", validators=[Optional()], format="%Y-%m-%d"
+        "Fecha de inicio de soporte",
+        format="%Y-%m-%d",
+        validators=[Optional()],
     )
 
     support_end_date = DateField(
-        "Fecha de Fin de Soporte", validators=[Optional()], format="%Y-%m-%d"
+        "Fecha de fin de soporte",
+        format="%Y-%m-%d",
+        validators=[Optional()],
+    )
+
+
+class CreateVersionForm(BaseVersionForm):
+    executable_file = FileField(
+        "Archivo ejecutable (.deb)",
+        validators=[
+            Optional(),
+            FileAllowed(["deb"], "Solo se permiten archivos .deb"),
+        ],
+    )
+
+    docker_compose_file = FileField(
+        "Archivo Docker Compose",
+        validators=[
+            Optional(),
+            FileAllowed(["yml", "yaml"], "Solo se permiten archivos .yml / .yaml"),
+        ],
     )
 
     submit = SubmitField("Crear Versión")
 
+    def __init__(self, *args, application_id=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.application_id = application_id
+
     def validate(self, extra_validators=None):
-        """Validación personalizada."""
         if not super().validate(extra_validators):
             return False
 
@@ -84,23 +112,40 @@ class BaseVersionForm(FlaskForm):
         return True
 
 
-class CreateVersionForm(BaseVersionForm):
-
-    submit = SubmitField("Crear Versión")
-
-    def validate_title(self, field):
-        if Version.query.filter_by(title=field.data).first():
-            raise ValidationError(
-                "Ya existe una aplicación registrada con este nombre."
-            )
-
-
 class EditVersionForm(BaseVersionForm):
-    """
-    Formulario para editar una Versión existente.
+    executable_file = FileField(
+        "Nuevo archivo ejecutable (.deb)",
+        validators=[
+            Optional(),
+            FileAllowed(["deb"], "Solo se permiten archivos .deb"),
+        ],
+    )
 
-    Permite modificar todos los campos y cambiar el Propietario (Owner).
-    """
+    docker_compose_file = FileField(
+        "Nuevo archivo Docker Compose",
+        validators=[
+            Optional(),
+            FileAllowed(["yml", "yaml"], "Solo se permiten archivos .yml / .yaml"),
+        ],
+    )
+
+    keep_executable = RadioField(
+        "Archivo ejecutable actual",
+        choices=[
+            ("true", "Mantener archivo actual"),
+            ("false", "Eliminar archivo actual"),
+        ],
+        default="true",
+    )
+
+    keep_docker_compose = RadioField(
+        "Archivo docker-compose actual",
+        choices=[
+            ("true", "Mantener archivo actual"),
+            ("false", "Eliminar archivo actual"),
+        ],
+        default="true",
+    )
 
     submit = SubmitField("Guardar Cambios")
 
@@ -109,18 +154,19 @@ class EditVersionForm(BaseVersionForm):
         self.version_id = version_id
 
     def validate_version_number(self, field):
-        """Valida que el número de versión sea único para la aplicación."""
         if self.version_id:
-
-            existing = Version.query.filter(
-                Version.version_number == field.data, Version.id != self.version_id
-            ).first()
-
+            existing = (
+                Version.query.filter(
+                    Version.version_number == field.data,
+                    Version.id != self.version_id,
+                )
+                .limit(1)
+                .first()
+            )
             if existing:
                 raise ValidationError("Ya existe otra versión con este número.")
 
     def validate(self, extra_validators=None):
-        """Validación personalizada."""
         if not super().validate(extra_validators):
             return False
 

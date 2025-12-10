@@ -1,6 +1,6 @@
 import os
 import pytest
-from app.config import create_app, db
+from app.config import create_app, db, TestConfig
 from app.models.role import Role, Permission
 from app.models.user import User
 from app.models.application import Application, ApplicationType, Stack, Framework
@@ -9,9 +9,7 @@ from app.models.application import Application, ApplicationType, Stack, Framewor
 @pytest.fixture(scope="function")
 def app():
     os.environ["DATABASE_URL"] = "sqlite:///:memory:"
-    app = create_app()
-    app.config["SECRET_KEY"] = "testing-key"
-    app.config["WTF_CSRF_ENABLED"] = False
+    app = create_app(TestConfig)
 
     with app.app_context():
         db.create_all()

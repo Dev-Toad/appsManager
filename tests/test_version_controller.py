@@ -1,6 +1,5 @@
-import os
 import pytest
-from app.config import create_app, db
+from app.config import create_app, db, TestConfig
 from app.models.role import Role, Permission
 from app.models.user import User
 from app.models.application import Application, ApplicationType, Stack, Framework
@@ -9,12 +8,10 @@ from app.models.version import Version
 
 @pytest.fixture(scope="function")
 def app():
-    os.environ["DATABASE_URL"] = "sqlite:///:memory:"
-    app = create_app()
-    app.config["SECRET_KEY"] = "testing-key"
-    app.config["WTF_CSRF_ENABLED"] = False
+    app = create_app(TestConfig)
 
     with app.app_context():
+        print(">> TEST DB:", db.engine.url)  # 👈
         db.create_all()
         yield app
         db.session.remove()
@@ -29,54 +26,85 @@ def client(app):
 def crear_permisos_roles_user_y_app():
     """
     Devuelve SOLO datos primitivos para evitar DetachedInstanceError.
+    Crea permisos/rol/usuario/app si no existen; si existen, los reutiliza.
     """
-    # Permisos de versión
-    p_create = Permission(
-        name="version:create", description="Crear versiones de aplicaciones"
-    )
-    p_edit = Permission(
-        name="version:edit", description="Editar versiones de aplicaciones"
-    )
-    p_delete = Permission(
-        name="version:delete", description="Eliminar versiones de aplicaciones"
-    )
-    db.session.add_all([p_create, p_edit, p_delete])
-    db.session.commit()
 
-    # Rol
-    role = Role(
-        name="Desarrollador",
-        permissions=[p_create, p_edit, p_delete],
+    def get_or_create_permission(name, description):
+        perm = Permission.query.filter_by(name=name).first()
+        if not perm:
+            perm = Permission(name=name, description=description)
+            db.session.add(perm)
+            db.session.commit()
+        return perm
+
+    # Permisos de versión (idempotente)
+    p_create = get_or_create_permission(
+        "version:create", "Crear versiones de aplicaciones"
     )
-    db.session.add(role)
-    db.session.commit()
+    p_edit = get_or_create_permission(
+        "version:edit", "Editar versiones de aplicaciones"
+    )
+    p_delete = get_or_create_permission(
+        "version:delete", "Eliminar versiones de aplicaciones"
+    )
 
-    # Usuario
-    user = User(username="devv", email="devv@test.com", role_id=role.id, is_active=True)
-    user.set_password("x")
-    db.session.add(user)
-    db.session.commit()
+    # Rol (si no existe)
+    role = Role.query.filter_by(name="Desarrollador").first()
+    if not role:
+        role = Role(
+            name="Desarrollador",
+            permissions=[p_create, p_edit, p_delete],
+        )
+        db.session.add(role)
+        db.session.commit()
 
-    # ApplicationType / Stack / Framework
-    app_type = ApplicationType(name="Web")
-    stack = Stack(name="Python")
-    framework = Framework(name="Flask", stack=stack)
-    db.session.add_all([app_type, stack, framework])
-    db.session.commit()
+    # Usuario (si no existe)
+    user = User.query.filter_by(username="devv").first()
+    if not user:
+        user = User(
+            username="devv",
+            email="devv@test.com",
+            role_id=role.id,
+            is_active=True,
+        )
+        user.set_password("x")
+        db.session.add(user)
+        db.session.commit()
+
+    # ApplicationType / Stack / Framework (idempotentes también)
+    app_type = ApplicationType.query.filter_by(name="Web").first()
+    if not app_type:
+        app_type = ApplicationType(name="Web")
+        db.session.add(app_type)
+        db.session.commit()
+
+    stack = Stack.query.filter_by(name="Python").first()
+    if not stack:
+        stack = Stack(name="Python")
+        db.session.add(stack)
+        db.session.commit()
+
+    framework = Framework.query.filter_by(name="Flask").first()
+    if not framework:
+        framework = Framework(name="Flask", stack=stack)
+        db.session.add(framework)
+        db.session.commit()
 
     # Aplicación
-    app_obj = Application(
-        nombre="AppForVersion",
-        descripcion="desc",
-        owner_id=user.id,
-        estado="Activa",
-        tipo_entorno="Desarrollo",
-        application_type=app_type,
-        stack_obj=stack,
-        framework_obj=framework,
-    )
-    db.session.add(app_obj)
-    db.session.commit()
+    app_obj = Application.query.filter_by(nombre="AppForVersion").first()
+    if not app_obj:
+        app_obj = Application(
+            nombre="AppForVersion",
+            descripcion="desc",
+            owner_id=user.id,
+            estado="Activa",
+            tipo_entorno="Desarrollo",
+            application_type=app_type,
+            stack_obj=stack,
+            framework_obj=framework,
+        )
+        db.session.add(app_obj)
+        db.session.commit()
 
     return {
         "user_username": user.username,
@@ -94,7 +122,6 @@ def login_test_client(client, username):
 
 
 def test_create_edit_delete_version(app, client):
-    # Config inicial dentro del contexto
     with app.app_context():
         data = crear_permisos_roles_user_y_app()
         user_username = data["user_username"]
@@ -104,7 +131,6 @@ def test_create_edit_delete_version(app, client):
     resp_login = login_test_client(client, user_username)
     assert resp_login.status_code == 200
 
-    # -------- CREAR VERSIÓN --------
     resp_create = client.post(
         f"/app/{app_id}/version/new",
         data={
@@ -158,7 +184,6 @@ def test_create_edit_delete_version(app, client):
         assert v_edited.title == "v1-edited"
         assert v_edited.db_manager_version == "14.1"
 
-    # -------- ELIMINAR VERSIÓN --------
     resp_delete = client.post(f"/version/{v.id}/delete", follow_redirects=True)
     assert resp_delete.status_code == 200
 

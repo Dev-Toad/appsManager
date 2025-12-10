@@ -1,13 +1,16 @@
+import os
 import pytest
-from app.config import db, create_app
+from app.config import db, create_app, TestConfig
 from app.models.user import User
 from app.models.role import Role
 
 
 @pytest.fixture
 def app():
-    app = create_app()
-    app.config["TESTING"] = True
+    os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+
+    app = create_app(TestConfig)
+
     with app.app_context():
         db.create_all()
         role = Role(name="Desarrollador")
@@ -19,9 +22,9 @@ def app():
         db.session.add(user)
         db.session.commit()
 
-    yield app
+        yield app
 
-    with app.app_context():
+        db.session.remove()
         db.drop_all()
 
 

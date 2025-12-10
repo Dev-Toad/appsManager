@@ -62,8 +62,12 @@
                 {% endif %}
             {% endwith %}
 
-            <!-- Formulario -->
-            <form method="POST" action="{{ url_for('app.new_version', app_id=app.id) }}" class="p-8" novalidate>
+            <!-- Formulario: Se añade 'enctype="multipart/form-data"' para permitir la subida de archivos -->
+            <form method="POST"
+                action="{{ url_for('app.new_version', app_id=app.id) }}"
+                class="p-8"
+                novalidate
+                enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
                 
                 <!-- Sección: Información de la Versión -->
@@ -139,6 +143,68 @@
                                 <p class="mt-1 text-sm text-red-600">{{ form.documentacion_url.errors[0] }}</p>
                             {% endif %}
                         </div>
+
+                        <!-- 🌟 CAMPO ACTUALIZADO: Subida de Archivo Ejecutable (.deb) 🌟 -->
+                        <div class="md:col-span-2">
+                            {{ form.executable_file.label(class="block text-sm font-semibold text-gray-700 mb-2") }}
+                            
+                            <div class="relative flex items-center justify-between p-1 border border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all">
+                                
+                                <label for="{{ form.executable_file.id }}" class="cursor-pointer bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg flex items-center transition-colors shadow-md">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    Subir Archivo .deb
+                                </label>
+                                
+                                {{ form.executable_file(class="hidden", accept=".deb") }}
+
+                                <span id="file_name_display" class="text-gray-500 italic truncate ml-4 mr-2">
+                                    Ningún archivo seleccionado.
+                                </span>
+                            </div>
+                            
+                            {% if form.executable_file.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.executable_file.errors[0] }}</p>
+                            {% else %}
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Sube el paquete ejecutable (.deb) para esta versión (opcional).
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <!-- URL Docker Compose (sin cambios) -->
+                        <!-- Archivo Docker Compose -->
+                        <div class="md:col-span-2 mt-4">
+                            {{ form.docker_compose_file.label(class="block text-sm font-semibold text-gray-700 mb-2") }}
+                            
+                            <div class="relative flex items-center justify-between p-1 border border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all">
+                                
+                                <label for="{{ form.docker_compose_file.id }}" class="cursor-pointer bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg flex items-center transition-colors shadow-md">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    Subir docker-compose.yml
+                                </label>
+                                
+                                {{ form.docker_compose_file(class="hidden", accept=".yml,.yaml") }}
+
+                                <span id="docker_file_name_display" class="text-gray-500 italic truncate ml-4 mr-2">
+                                    Ningún archivo seleccionado.
+                                </span>
+                            </div>
+                            
+                            {% if form.docker_compose_file.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.docker_compose_file.errors[0] }}</p>
+                            {% else %}
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Sube el archivo docker-compose para esta versión (opcional).
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <!-- ------------------------------------------------ -->
+
                     </div>
                 </div>
 
@@ -312,4 +378,43 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const exeInput = document.getElementById('{{ form.executable_file.id }}');
+        const exeLabel = document.getElementById('file_name_display');
+
+        if (exeInput && exeLabel) {
+            exeInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    exeLabel.textContent = e.target.files[0].name;
+                    exeLabel.classList.remove('text-gray-500', 'italic');
+                    exeLabel.classList.add('text-gray-800', 'font-medium');
+                } else {
+                    exeLabel.textContent = 'Ningún archivo seleccionado.';
+                    exeLabel.classList.add('text-gray-500', 'italic');
+                    exeLabel.classList.remove('text-gray-800', 'font-medium');
+                }
+            });
+        }
+
+        const dcInput = document.getElementById('{{ form.docker_compose_file.id }}');
+        const dcLabel = document.getElementById('docker_file_name_display');
+
+        if (dcInput && dcLabel) {
+            dcInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    dcLabel.textContent = e.target.files[0].name;
+                    dcLabel.classList.remove('text-gray-500', 'italic');
+                    dcLabel.classList.add('text-gray-800', 'font-medium');
+                } else {
+                    dcLabel.textContent = 'Ningún archivo seleccionado.';
+                    dcLabel.classList.add('text-gray-500', 'italic');
+                    dcLabel.classList.remove('text-gray-800', 'font-medium');
+                }
+            });
+        }
+    });
+</script>
+
 {% endblock %}
