@@ -38,35 +38,29 @@ STACKS_AND_FRAMEWORKS = {
     ],
 }
 
-# --- FUNCIÓN DE SIEMBRA DE DATOS INICIALES UNIFICADA CORREGIDA ---
 
-
-# CRÍTICO: Aquí se aceptan los 4 argumentos que se pasan desde seed_data.py
 def run_seed(db, ApplicationType, Stack, Framework):
     """
     Función principal para insertar todos los datos de catálogo (Tipos, Stacks y Frameworks)
     en la base de datos de forma atómica si no existen.
     """
 
-    # Iniciar la transacción
     db.session.begin()
     print("--- INICIANDO PROCESO DE SIEMBRA DE DATOS DE CATÁLOGO ---")
 
     try:
-        # A. Siembra de Application Types
+
         print("\n[A] Sembrando Tipos de Aplicación...")
         for type_name in APPLICATION_TYPES:
-            # Uso de ApplicationType (el modelo que se pasó como argumento)
+
             existing_type = ApplicationType.query.filter_by(name=type_name).first()
             if not existing_type:
                 db.session.add(ApplicationType(name=type_name))
                 print(f"  ✅ Agregado Tipo: {type_name}")
 
-        # B. Siembra de Stacks y Frameworks
         print("\n[B] Sembrando Stacks y Frameworks...")
         stack_objects = {}
 
-        # B.1 Insertar Stacks (Padres)
         for stack_name in STACKS_AND_FRAMEWORKS.keys():
             existing_stack = Stack.query.filter_by(name=stack_name).first()
 

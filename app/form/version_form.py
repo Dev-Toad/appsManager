@@ -62,6 +62,16 @@ class BaseVersionForm(FlaskForm):
         validators=[Optional()],
     )
 
+    
+    docker_url = StringField(
+        "URL del Docker",
+        validators=[
+            Optional(),
+            URL(message="Debe ser una URL válida"),
+            Length(max=255),
+        ],
+    )
+
     support_start_date = DateField(
         "Fecha de inicio de soporte",
         format="%Y-%m-%d",

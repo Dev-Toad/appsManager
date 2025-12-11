@@ -258,7 +258,7 @@
                     </div>
                 </div>
 
-                <!-- Sección: Archivo Docker Compose -->
+                                <!-- Sección: Archivo Docker Compose -->
                 <div class="mb-8">
                     <div class="flex items-center mb-4 pb-2 border-b-2 border-emerald-500">
                         <svg class="w-6 h-6 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -266,6 +266,31 @@
                                   d="M3 7h18M3 12h18M3 17h18" />
                         </svg>
                         <h2 class="text-xl font-semibold text-gray-800">Archivo docker-compose</h2>
+                    </div>
+
+                    <!-- URL Docker con más espacio y texto de ayuda -->
+                    <div class="mt-4 mb-6">
+                        {{ form.docker_url.label(class="block text-sm font-semibold text-gray-700 mb-2") }}
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                </svg>
+                            </div>
+                            {{ form.docker_url(
+                                class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" +
+                                      (" border-red-500" if form.docker_url.errors else ""),
+                                placeholder="https://docs.mi-app.com/version/1.0.0"
+                            ) }}
+                        </div>
+                        {% if form.docker_url.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.docker_url.errors[0] }}</p>
+                        {% else %}
+                            <p class="mt-1 text-xs text-gray-500">
+                                Esta URL es opcional. Úsala si tienes la documentación o el repositorio del docker-compose publicado.
+                            </p>
+                        {% endif %}
                     </div>
 
                     {% if version.docker_compose_url %}
@@ -283,7 +308,7 @@
                         <a href="{{ url_for('app.download_version_file_route',
                                             version_id=version.id,
                                             file_type='docker_compose') }}"
-                        class="text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                           class="text-sm font-semibold text-emerald-600 hover:text-emerald-700">
                             Descargar
                         </a>
                     </div>
@@ -338,6 +363,7 @@
                         {% endif %}
                     </div>
                 </div>
+
 
                 <!-- Sección: Base de Datos y Dependencias -->
                 <div class="mb-8">

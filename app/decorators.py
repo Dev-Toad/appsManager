@@ -46,11 +46,6 @@ def permissions_required(permission_names):
                     url_for(current_app.config.get("LOGIN_VIEW", "auth.login"))
                 )
 
-            # --- Lógica OR implementada aquí ---
-            # Comprueba si el usuario tiene *cualquiera* de los permisos.
-            # current_user.can(perm) devuelve True o False.
-            # La función 'any()' devuelve True si AL MENOS UNO de los resultados es True.
-
             has_permission = any(current_user.can(perm) for perm in permission_names)
 
             if not has_permission:

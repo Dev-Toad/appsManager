@@ -11,7 +11,7 @@ def app():
     app = create_app(TestConfig)
 
     with app.app_context():
-        print(">> TEST DB:", db.engine.url)  # 👈
+        print(">> TEST DB:", db.engine.url)
         db.create_all()
         yield app
         db.session.remove()
@@ -37,7 +37,6 @@ def crear_permisos_roles_user_y_app():
             db.session.commit()
         return perm
 
-    # Permisos de versión (idempotente)
     p_create = get_or_create_permission(
         "version:create", "Crear versiones de aplicaciones"
     )
@@ -48,7 +47,6 @@ def crear_permisos_roles_user_y_app():
         "version:delete", "Eliminar versiones de aplicaciones"
     )
 
-    # Rol (si no existe)
     role = Role.query.filter_by(name="Desarrollador").first()
     if not role:
         role = Role(
@@ -58,7 +56,6 @@ def crear_permisos_roles_user_y_app():
         db.session.add(role)
         db.session.commit()
 
-    # Usuario (si no existe)
     user = User.query.filter_by(username="devv").first()
     if not user:
         user = User(
@@ -71,7 +68,6 @@ def crear_permisos_roles_user_y_app():
         db.session.add(user)
         db.session.commit()
 
-    # ApplicationType / Stack / Framework (idempotentes también)
     app_type = ApplicationType.query.filter_by(name="Web").first()
     if not app_type:
         app_type = ApplicationType(name="Web")
@@ -90,7 +86,6 @@ def crear_permisos_roles_user_y_app():
         db.session.add(framework)
         db.session.commit()
 
-    # Aplicación
     app_obj = Application.query.filter_by(nombre="AppForVersion").first()
     if not app_obj:
         app_obj = Application(
@@ -127,7 +122,6 @@ def test_create_edit_delete_version(app, client):
         user_username = data["user_username"]
         app_id = data["app_id"]
 
-    # Login
     resp_login = login_test_client(client, user_username)
     assert resp_login.status_code == 200
 
@@ -161,7 +155,6 @@ def test_create_edit_delete_version(app, client):
                 "coincidan exactamente con CreateVersionForm (especialmente fechas)."
             )
 
-    # -------- EDITAR VERSIÓN --------
     resp_edit = client.post(
         f"/version/{v.id}/edit",
         data={

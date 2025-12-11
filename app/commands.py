@@ -8,9 +8,7 @@ def seed_roles_and_permissions():
     """Crea roles y permisos iniciales si no existen (con granularidad)."""
 
     permissions_data = {
-        # Permiso de Acceso
         "admin:access": "Permite el acceso al dashboard administrativo.",
-        # Permisos de Usuarios (Granulares)
         "user:read": "Permite ver la lista de usuarios.",
         "user:create": "Permite crear nuevos usuarios.",
         "user:edit": "Permite modificar usuarios existentes (info, rol).",
@@ -39,23 +37,19 @@ def seed_roles_and_permissions():
             print(f"  -> Creado Permiso: {name}")
         permissions_objects[name] = permission
 
-    # Definición de Roles
     administrator_permissions = [
         permissions_objects["admin:access"],
         permissions_objects["role:manage"],
-        # Permisos de Usuario
         permissions_objects["user:read"],
         permissions_objects["user:create"],
         permissions_objects["user:edit"],
         permissions_objects["user:view"],
         permissions_objects["user:toggle_status"],
-        # Permisos de Aplicación
         permissions_objects["app:read"],
         permissions_objects["app:create"],
         permissions_objects["app:edit"],
         permissions_objects["app:view"],
         permissions_objects["app:delete"],
-        # Permisos de Versión
         permissions_objects["version:create"],
         permissions_objects["version:edit"],
         permissions_objects["version:view"],

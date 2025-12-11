@@ -1,5 +1,3 @@
-# tests/test_user_loader.py
-
 import pytest
 
 from app.config import create_app, db, TestConfig
@@ -43,12 +41,11 @@ def setup_user(app):
     y el user_loader de Flask-Login.
     """
     with app.app_context():
-        # Crear un rol simple
+
         role = Role(name="Tester")
         db.session.add(role)
         db.session.commit()
 
-        # Crear usuario de prueba
         user = User(
             username="loader_user",
             email="loader@example.com",
@@ -62,7 +59,6 @@ def setup_user(app):
 
         yield user
 
-        # Limpieza entre tests
         db.session.remove()
 
 
@@ -76,6 +72,4 @@ def test_user_loader_login_flow(client, setup_user):
     resp = login(client, user.username)
     assert resp.status_code == 200
 
-    # Ajusta estas comprobaciones según lo que muestre tu template tras login
-    # Por ejemplo, si en tu navbar aparece el username o algo del dashboard.
     assert b"loader_user" in resp.data or b"Logout" in resp.data

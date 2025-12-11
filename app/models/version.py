@@ -18,6 +18,7 @@ class Version(db.Model):
     executable_file_url = db.Column(db.String(255))
 
     docker_compose_url = db.Column(db.Text)
+    docker_url = db.Column(db.String(255))
 
     db_manager = db.Column(db.String(50))
     db_manager_version = db.Column(db.String(50))

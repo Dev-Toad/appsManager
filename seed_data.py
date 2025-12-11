@@ -10,7 +10,6 @@ def execute_seed():
     """
     Inicializa la aplicación Flask y ejecuta la siembra dentro del contexto necesario.
     """
-    # Inicializar la aplicación
     app = create_app()
 
     with app.app_context():
