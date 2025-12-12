@@ -1,28 +1,33 @@
-version: '3.8'
-
 services:
   web:
+    
     build: .
-    ports:
-      - "5000:5000"
+    container_name: flask_app
     env_file:
       - .env
+    environment:
+      FLASK_APP: run:app
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://andres:1q2w3e4r5t@db:5432/demo
+      
+    ports:
+      - "8000:8000"   
     depends_on:
       - db
     volumes:
-      - .:/app
-    restart: unless-stopped
+      - ./uploads:/app/uploads
 
   db:
-    image: postgres:15
+    image: postgres:16
+    container_name: demo_db
     environment:
-      POSTGRES_DB: appdb
-      POSTGRES_USER: appuser
-      POSTGRES_PASSWORD: apppass
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      POSTGRES_DB: demo
+      POSTGRES_USER: andres
+      POSTGRES_PASSWORD: 1q2w3e4r5t
     ports:
       - "5433:5432"
+    volumes:
+      - demo_pgdata:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  demo_pgdata:
