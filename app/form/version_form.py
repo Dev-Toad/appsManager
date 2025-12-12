@@ -62,7 +62,6 @@ class BaseVersionForm(FlaskForm):
         validators=[Optional()],
     )
 
-    
     docker_url = StringField(
         "URL del Docker",
         validators=[

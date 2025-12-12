@@ -57,7 +57,7 @@ def new_version(app_id):
                 documentacion_url=form.documentacion_url.data or None,
                 executable_file_url=executable_path,
                 docker_compose_url=docker_compose_path,
-                docker_url =form.docker_url.data or None,
+                docker_url=form.docker_url.data or None,
                 db_manager=form.db_manager.data or None,
                 db_manager_version=form.db_manager_version.data or None,
                 dependencias=form.dependencias.data or None,
