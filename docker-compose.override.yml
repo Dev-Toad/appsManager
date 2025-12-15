@@ -1,0 +1,15 @@
+services:
+  web:
+    environment:
+      FLASK_ENV: development
+    ports:
+      - "8000:8000"   # acceso directo sin Nginx
+    command: flask run --host=0.0.0.0 --port=8000
+
+  db:
+    ports:
+      - "5433:5432"   # poder conectar desde DBeaver/psql
+
+  nginx:
+    profiles:
+      - prod
