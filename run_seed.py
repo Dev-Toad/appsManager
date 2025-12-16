@@ -1,42 +1,100 @@
 APPLICATION_TYPES = [
-    "Frontend Web",
-    "Mobile App (Nativa)",
-    "Backend / API",
-    "Microservicio",
-    "API Gateway",
-    "Servicio de Colas/Mensajería",
-    "Servicio de Cache",
-    "Base de Datos",
-    "Integración / ETL",
-    "Servicio de Autenticación",
-    "Computación sin Servidor (Serverless)",
-    "Legacy / Monolito",
+    "Robot de Monitoreo",
+    "API",
+    "Replicador",
+    "Script",
+    "Bash",
+    "Aplicacion Web",
+    "Aplicacion de Escritorio",
+    "Aplicación de Consola",
+    "App Nativa",
+    "App Hibrida",
 ]
 
 STACKS_AND_FRAMEWORKS = {
-    "Python": ["Flask", "Django", "FastAPI", "Pandas", "Pyramid"],
-    "JavaScript/Node.js": [
-        "React",
-        "Vue.js",
-        "Angular",
-        "Express.js",
-        "Next.js",
-        "NestJS",
-        "Nuxt.js",
+    "C": [
+        "GTK",
+        "Qt",   
+        "SDL",
+        "OpenGL",
+        "libuv",
     ],
-    "Java": ["Spring Boot", "Spring MVC", "Jakarta EE", "Hibernate", "JAX-RS"],
-    "C# / .NET": [".NET Core", "ASP.NET MVC", "Xamarin", "Blazor"],
-    "PHP": ["Laravel", "Symfony", "CodeIgniter"],
-    "Go": ["Gin", "Echo", "Revel", "Gorilla Mux"],
-    "Mobile Nativo": [
-        "Swift",
-        "Kotlin",
-        "Objective-C",
-        "Java (Android)",
-        "Flutter",
-        "React Native",
+
+    "C++": [
+        "Qt",
+        "Boost",
+        "POCO",
+        "JUCE",
+        "Unreal Engine",
+    ],
+
+    "Perl": [
+        "Mojolicious",
+        "Catalyst",
+        "Dancer",
+        "Plack",
+    ],
+
+    "Python": [
+        "Flask",
+        "Django",
+        "FastAPI",
+        "Tornado",
+        "Pyramid",
+    ],
+
+    "Ruby": [
+        "Ruby on Rails",
+        "Sinatra",
+        "Hanami",
+        "Grape",
+    ],
+
+    "Golang": [
+        "Gin",
+        "Echo",
+        "Fiber",
+        "Revel",
+        "Chi",
+    ],
+
+    "JavaScript": [
+        "Express.js",
+        "NestJS",
+        "Next.js",
+        "Nuxt.js",
+        "Electron",
+    ],
+
+    "TypeScript": [
+        "NestJS",
+        "Next.js",
+        "Angular",
+        "Deno",
+        "AdonisJS",
+    ],
+
+    "Kotlin": [
+        "Spring Boot",
+        "Ktor",
+        "Micronaut",
+        "Android SDK",
+    ],
+
+    "Rust": [
+        "Actix Web",
+        "Rocket",
+        "Axum",
+        "Warp",
+    ],
+
+    "PL/SQL": [
+        "Oracle APEX",
+        "Oracle Forms",
+        "Oracle Reports",
     ],
 }
+
 
 
 def run_seed(db, ApplicationType, Stack, Framework):
