@@ -34,7 +34,7 @@ class Framework(db.Model):
 
     __tablename__ = "frameworks"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50),  nullable=False)
+    name = db.Column(db.String(50), nullable=False)
 
     stack_id = db.Column(
         db.Integer, db.ForeignKey("stacks.id"), nullable=False, index=True

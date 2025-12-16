@@ -14,12 +14,11 @@ APPLICATION_TYPES = [
 STACKS_AND_FRAMEWORKS = {
     "C": [
         "GTK",
-        "Qt",   
+        "Qt",
         "SDL",
         "OpenGL",
         "libuv",
     ],
-
     "C++": [
         "Qt",
         "Boost",
@@ -27,14 +26,12 @@ STACKS_AND_FRAMEWORKS = {
         "JUCE",
         "Unreal Engine",
     ],
-
     "Perl": [
         "Mojolicious",
         "Catalyst",
         "Dancer",
         "Plack",
     ],
-
     "Python": [
         "Flask",
         "Django",
@@ -42,14 +39,12 @@ STACKS_AND_FRAMEWORKS = {
         "Tornado",
         "Pyramid",
     ],
-
     "Ruby": [
         "Ruby on Rails",
         "Sinatra",
         "Hanami",
         "Grape",
     ],
-
     "Golang": [
         "Gin",
         "Echo",
@@ -57,7 +52,6 @@ STACKS_AND_FRAMEWORKS = {
         "Revel",
         "Chi",
     ],
-
     "JavaScript": [
         "Express.js",
         "NestJS",
@@ -65,7 +59,6 @@ STACKS_AND_FRAMEWORKS = {
         "Nuxt.js",
         "Electron",
     ],
-
     "TypeScript": [
         "NestJS",
         "Next.js",
@@ -73,28 +66,24 @@ STACKS_AND_FRAMEWORKS = {
         "Deno",
         "AdonisJS",
     ],
-
     "Kotlin": [
         "Spring Boot",
         "Ktor",
         "Micronaut",
         "Android SDK",
     ],
-
     "Rust": [
         "Actix Web",
         "Rocket",
         "Axum",
         "Warp",
     ],
-
     "PL/SQL": [
         "Oracle APEX",
         "Oracle Forms",
         "Oracle Reports",
     ],
 }
-
 
 
 def run_seed(db, ApplicationType, Stack, Framework):
