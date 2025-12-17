@@ -7,14 +7,19 @@ from sqlalchemy.exc import IntegrityError
 
 from app.decorators import permissions_required
 from app.form.aplication_form import EditApplicationForm, CreateApplicationForm
+from sqlalchemy import desc, func
+
+from sqlalchemy.orm import joinedload
 
 
 def app_list():
+    page = request.args.get("page", 1, type=int)
+    per_page = 25
 
     search_query = request.args.get("q", "").strip()
     filter_type = request.args.get("type", "").strip()
 
-    query = Application.query
+    query = Application.query.options(joinedload(Application.application_type))
 
     if search_query:
         query = query.filter(Application.nombre.ilike(f"%{search_query}%"))
@@ -24,13 +29,31 @@ def app_list():
             ApplicationType.name == filter_type
         )
 
-    apps = query.order_by(Application.nombre).all()
+    pagination = query.order_by(
+        desc(Application.updated_at),
+        desc(Application.created_at),
+        desc(Application.id),
+    ).paginate(page=page, per_page=per_page, error_out=False)
+
+    total_apps = query.order_by(None).count()
+
+    counts_rows = (
+        query.order_by(None)
+        .join(Application.application_type)
+        .with_entities(ApplicationType.name, func.count(Application.id))
+        .group_by(ApplicationType.name)
+        .all()
+    )
+    counts_by_type = {name: count for name, count in counts_rows}
 
     app_types = ApplicationType.query.order_by(ApplicationType.name).all()
 
     return render_template(
         "dashboard/applications/applications.html",
-        apps=apps,
+        apps=pagination.items,
+        pagination=pagination,
+        total_apps=total_apps,
+        counts_by_type=counts_by_type,
         search_query=search_query,
         filter_type=filter_type,
         app_types=app_types,

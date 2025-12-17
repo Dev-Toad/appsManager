@@ -38,7 +38,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total Apps</p>
-                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ apps|length }}</p> 
+                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ total_apps }}</p> 
                     </div>
                     <div class="bg-indigo-100 rounded-full p-3">
                         <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +53,9 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Apps Web</p>
-                        <p class="text-3xl font-bold text-blue-600 mt-1">{{ apps|selectattr('application_type.name', 'equalto', 'Web')|list|length }}</p>
+                        <p class="text-3xl font-bold text-blue-600 mt-1">
+                        {{ counts_by_type.get('Aplicacion Web', 0) }}
+                        </p>
                     </div>
                     <div class="bg-blue-100 rounded-full p-3">
                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +70,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Apps API</p>
-                        <p class="text-3xl font-bold text-green-600 mt-1">{{ apps|selectattr('application_type.name', 'equalto', 'Api')|list|length }}</p>
+                        <p class="text-3xl font-bold text-green-600 mt-1">{{ counts_by_type.get('API', 0) }}</p>
                     </div>
                     <div class="bg-green-100 rounded-full p-3">
                         <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,13 +85,105 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Robots</p>
-                        <p class="text-3xl font-bold text-purple-600 mt-1">{{ apps|selectattr('application_type.name', 'equalto', 'robot')|list|length }}</p>
+                        <p class="text-3xl font-bold text-purple-600 mt-1">{{ counts_by_type.get('Robot de Monitoreo', 0) }}</p>
                     </div>
                     <div class="bg-purple-100 rounded-full p-3">
                         <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
                     </div>
+                </div>
+            </div>
+
+
+             <!-- Replicador -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-cyan-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Replicador</p>
+                        <p class="text-3xl font-bold text-cyan-600 mt-1">
+                            {{ counts_by_type.get('Replicador', 0) }}
+                        </p>
+                    </div>
+                    <div class="bg-cyan-100 rounded-full p-3">📡</div>
+                </div>
+            </div>
+
+            <!-- Script -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Script</p>
+                        <p class="text-3xl font-bold text-orange-600 mt-1">
+                            {{ counts_by_type.get('Script', 0) }}
+                        </p>
+                    </div>
+                    <div class="bg-orange-100 rounded-full p-3">📜</div>
+                </div>
+            </div>
+
+            <!-- Bash -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Bash</p>
+                        <p class="text-3xl font-bold text-yellow-600 mt-1">
+                            {{ counts_by_type.get('Bash', 0) }}
+                        </p>
+                    </div>
+                    <div class="bg-yellow-100 rounded-full p-3">💻</div>
+                </div>
+            </div>
+
+            <!-- Aplicación de Escritorio -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-pink-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">App Escritorio</p>
+                        <p class="text-3xl font-bold text-pink-600 mt-1">
+                            {{ counts_by_type.get('Aplicacion de Escritorio', 0) }}
+                        </p>
+                    </div>
+                    <div class="bg-pink-100 rounded-full p-3">🖥️</div>
+                </div>
+            </div>
+
+            <!-- Aplicación de Consola -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-teal-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">App Consola</p>
+                        <p class="text-3xl font-bold text-teal-600 mt-1">
+                            {{ counts_by_type.get('Aplicación de Consola', 0) }}
+                        </p>
+                    </div>
+                    <div class="bg-teal-100 rounded-full p-3">⌨️</div>
+                </div>
+            </div>
+
+            <!-- App Nativa -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">App Nativa</p>
+                        <p class="text-3xl font-bold text-red-600 mt-1">
+                            {{ counts_by_type.get('App Nativa', 0) }}
+                        </p>
+                    </div>
+                    <div class="bg-red-100 rounded-full p-3">📱</div>
+                </div>
+            </div>
+
+            <!-- App Híbrida -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-fuchsia-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">App Híbrida</p>
+                        <p class="text-3xl font-bold text-fuchsia-600 mt-1">
+                            {{ counts_by_type.get('App Hibrida', 0) }}
+                        </p>
+                    </div>
+                    <div class="bg-fuchsia-100 rounded-full p-3">🔀</div>
                 </div>
             </div>
         </div>
@@ -220,21 +314,55 @@
         </div>
 
         <!-- Paginación (opcional) -->
-        {% if apps %}
-        <div class="mt-8 flex items-center justify-between">
-            <div class="text-sm text-gray-700">
-                Mostrando <span class="font-medium">{{ apps|length }}</span> aplicaciones
+       {% if pagination %}
+            <div class="mt-8 flex items-center justify-between">
+                <div class="text-sm text-gray-700">
+                    Mostrando <span class="font-medium">{{ pagination.items|length }}</span>
+                    de <span class="font-medium">{{ pagination.total }}</span> aplicaciones
+                </div>
+
+                <div class="flex space-x-2">
+                    {% if pagination.has_prev %}
+                    <a
+                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                        href="{{ url_for('app.app_list',
+                            page=pagination.prev_num,
+                            q=search_query,
+                            type=filter_type
+                        ) }}"
+                    >
+                        Anterior
+                    </a>
+                    {% else %}
+                    <span
+                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-400 bg-gray-100 cursor-not-allowed"
+                    >
+                        Anterior
+                    </span>
+                    {% endif %}
+
+                    {% if pagination.has_next %}
+                    <a
+                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                        href="{{ url_for('app.app_list',
+                            page=pagination.next_num,
+                            q=search_query,
+                            type=filter_type
+                        ) }}"
+                    >
+                        Siguiente
+                    </a>
+                    {% else %}
+                    <span
+                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-400 bg-gray-100 cursor-not-allowed"
+                    >
+                        Siguiente
+                    </span>
+                    {% endif %}
+                </div>
             </div>
-            <div class="flex space-x-2">
-                <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50" disabled>
-                    Anterior
-                </button>
-                <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50" disabled>
-                    Siguiente
-                </button>
-            </div>
-        </div>
-        {% endif %}
+            {% endif %}
+
     </div>
 </div>
 {% endblock %}
