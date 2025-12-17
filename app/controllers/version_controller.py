@@ -1,7 +1,7 @@
 import os
 from flask import render_template, redirect, url_for, flash, abort
 from flask_login import current_user
-from app.models import Version, Application
+from app.models import Version, Application, SOCompatible
 from app.config import db
 from app.decorators import permissions_required
 from app.form.version_form import CreateVersionForm, EditVersionForm
@@ -66,6 +66,8 @@ def new_version(app_id):
                 release_owner=current_user,
                 application_id=app_id,
             )
+            for so_name in getattr(form, "so_compatibles", None).data or []:
+                new_version.so_compatibles.append(SOCompatible(nombre_so=so_name))
 
             db.session.add(new_version)
             db.session.commit()
@@ -115,6 +117,11 @@ def edit_version(version_id):
 
     form = EditVersionForm(obj=version, version_id=version_id)
 
+    if not form.validate_on_submit():
+        form.so_compatibles.data = [
+            so.nombre_so for so in (version.so_compatibles or [])
+        ]
+
     new_executable_path = None
     new_docker_compose_path = None
     files_to_delete_on_success = []
@@ -134,7 +141,9 @@ def edit_version(version_id):
 
                     if old_executable:
                         files_to_delete_on_success.append(old_executable)
+
                     version.executable_file_url = new_executable_path
+
                 except ValueError as e:
                     flash(f"Error en archivo ejecutable: {str(e)}", "danger")
                     return render_template(
@@ -155,9 +164,12 @@ def edit_version(version_id):
                         form.version_number.data,
                         "docker_compose",
                     )
+
                     if old_docker_compose:
                         files_to_delete_on_success.append(old_docker_compose)
+
                     version.docker_compose_url = new_docker_compose_path
+
                 except ValueError as e:
                     _cleanup_files(new_executable_path, None)
                     flash(f"Error en archivo Docker Compose: {str(e)}", "danger")
@@ -183,6 +195,10 @@ def edit_version(version_id):
             version.support_start_date = form.support_start_date.data
             version.support_end_date = form.support_end_date.data
 
+            version.so_compatibles.clear()
+            for so_name in form.so_compatibles.data or []:
+                version.so_compatibles.append(SOCompatible(nombre_so=so_name))
+
             db.session.commit()
 
             for file_path in files_to_delete_on_success:
@@ -199,6 +215,7 @@ def edit_version(version_id):
             db.session.rollback()
             _cleanup_files(new_executable_path, new_docker_compose_path)
             flash("Error: El número de versión ya existe.", "error")
+
         except Exception as e:
             db.session.rollback()
             _cleanup_files(new_executable_path, new_docker_compose_path)

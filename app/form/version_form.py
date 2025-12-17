@@ -10,6 +10,23 @@ from wtforms.validators import DataRequired, Optional, Length, ValidationError, 
 from flask_wtf.file import FileField, FileAllowed
 from app.models import Role, User, Version
 from app.config import db
+from wtforms import SelectMultipleField
+from wtforms.widgets import ListWidget, CheckboxInput
+
+SO_CHOICES = [
+    ("Windows 11", "Windows 11"),
+    ("Windows 10", "Windows 10"),
+    ("Ubuntu 22.04", "Ubuntu 22.04"),
+    ("Ubuntu 20.04", "Ubuntu 20.04"),
+    ("Debian 12", "Debian 12"),
+    ("CentOS 7", "CentOS 7"),
+    ("macOS", "macOS"),
+]
+
+
+class MultiCheckboxField(SelectMultipleField):
+    widget = ListWidget(prefix_label=False)
+    option_widget = CheckboxInput()
 
 
 def get_developer_users_query():
@@ -69,6 +86,11 @@ class BaseVersionForm(FlaskForm):
             URL(message="Debe ser una URL válida"),
             Length(max=255),
         ],
+    )
+    so_compatibles = MultiCheckboxField(
+        "Sistemas Operativos compatibles",
+        choices=SO_CHOICES,
+        validators=[Optional()],
     )
 
     support_start_date = DateField(

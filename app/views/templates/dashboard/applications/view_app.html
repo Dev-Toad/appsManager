@@ -6,7 +6,7 @@
 <div class="min-h-screen bg-gray-50 py-8">
     <div class="container mx-auto px-4 max-w-6xl">
         
-        <!-- Botones de Acción Superiores -->
+        
         <div class="flex flex-wrap gap-3 mb-6">
             <a href="{{ url_for('app.app_list') }}" 
                class="inline-flex items-center bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-semibold transition-all duration-200">
@@ -31,18 +31,18 @@
             </a>
         </div>
 
-        <!-- Card Principal de Información -->
+        
         <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
             
-            <!-- Header del Card -->
+            
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <!-- CAMBIO: app.nombre -> app.name -->
+                        
                         <h1 class="text-3xl font-bold text-white">{{ app.nombre }}</h1>
                         <p class="text-blue-100 mt-1">Información general de la aplicación</p>
                     </div>
-                    <!-- Badge de Estado -->
+                    
                     {% if app.estado == 'Activa' %}
                         <span class="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full font-semibold text-sm shadow-lg">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -58,10 +58,10 @@
                 </div>
             </div>
 
-            <!-- Contenido del Card -->
+            
             <div class="p-8">
                 
-                <!-- Sección: Información General -->
+                
                 <div class="mb-8">
                     <div class="flex items-center mb-6 pb-2 border-b-2 border-blue-500">
                         <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,9 +70,9 @@
                         <h2 class="text-xl font-semibold text-gray-800">Información General</h2>
                     </div>
 
-                    <!-- Grid de información -->
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Descripción -->
+                        
                         <div class="bg-gray-50 rounded-lg p-5 border border-gray-200 md:col-span-2">
                             <div class="flex items-start">
                                 <div class="bg-purple-100 rounded-lg p-3 mr-4">
@@ -82,13 +82,13 @@
                                 </div>
                                 <div class="flex-1">
                                     <p class="text-sm font-medium text-gray-500 mb-1">Descripción</p>
-                                    <!-- CAMBIO: app.descripcion -> app.description -->
+                                    
                                     <p class="text-base text-gray-900 leading-relaxed">{{ app.descripcion or 'Sin descripción' }}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Repositorio -->
+                        
                         <div class="bg-gray-50 rounded-lg p-5 border border-gray-200 md:col-span-2">
                             <div class="flex items-start">
                                 <div class="bg-indigo-100 rounded-lg p-3 mr-4">
@@ -98,7 +98,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <p class="text-sm font-medium text-gray-500 mb-1">Repositorio</p>
-                                    <!-- CAMBIO: app.repositorio_url -> app.repository_url -->
+                                    
                                     {% if app.repositorio_url %}
                                         <a href="{{ app.repositorio_url }}" target="_blank" 
                                            class="text-base text-blue-600 hover:text-blue-700 hover:underline font-medium break-all">
@@ -111,7 +111,7 @@
                             </div>
                         </div>
 
-                        <!-- Tipo -->
+                        
                         <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
                             <div class="flex items-start">
                                 <div class="bg-blue-100 rounded-lg p-3 mr-4">
@@ -126,7 +126,7 @@
                             </div>
                         </div>
 
-                        <!-- Stack -->
+                        
                         <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
                             <div class="flex items-start">
                                 <div class="bg-green-100 rounded-lg p-3 mr-4">
@@ -141,7 +141,7 @@
                             </div>
                         </div>
 
-                        <!-- Framework -->
+                        
                         <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
                             <div class="flex items-start">
                                 <div class="bg-orange-100 rounded-lg p-3 mr-4">
@@ -156,7 +156,7 @@
                             </div>
                         </div>
 
-                        <!-- Tipo Entorno -->
+                        
                         <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
                             <div class="flex items-start">
                                 <div class="bg-teal-100 rounded-lg p-3 mr-4">
@@ -171,7 +171,7 @@
                             </div>
                         </div>
 
-                        <!-- Versión Docker (condicional) -->
+                        
                         {% if app.tipo_entorno == 'docker' and app.version_docker %}
                         <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
                             <div class="flex items-start">
@@ -188,7 +188,7 @@
                         </div>
                         {% endif %}
 
-                        <!-- Dueño -->
+                        
                         <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
                             <div class="flex items-start">
                                 <div class="bg-pink-100 rounded-lg p-3 mr-4">
@@ -204,7 +204,7 @@
                             </div>
                         </div>
 
-                        <!-- Fecha de Creación -->
+                        
                         <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
                             <div class="flex items-start">
                                 <div class="bg-indigo-100 rounded-lg p-3 mr-4">
@@ -223,7 +223,7 @@
             </div>
         </div>
 
-        <!-- Sección: Versiones -->
+        
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
             <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-6">
                 <div class="flex items-center justify-between">
@@ -259,16 +259,16 @@
                         {% for version in versions %}
                         <div class="bg-white border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-lg transition-all duration-200">
                             <div class="p-6">
-                                <!-- Header de la versión -->
+                                
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-3 mb-2">
                                             <h3 class="text-xl font-bold text-gray-900">{{ version.version_number }}</h3>
                                             <span class="text-gray-400">-</span>
-                                            <!-- CAMBIO: version.titulo -> version.title -->
+                                            
                                             <h4 class="text-xl font-semibold text-gray-700">{{ version.title }}</h4>
                                         </div>
-                                        <!-- CAMBIO: version.descripcion -> version.description -->
+                                        
                                         <p class="text-gray-600 text-sm leading-relaxed">{{ version.description or 'Sin descripción' }}</p>
                                     </div>
                                     <div class="flex gap-2 ml-4">
@@ -289,7 +289,7 @@
                                             </svg>
                                             Editar
                                         </a>
-                                        <!-- NOTE: Se mantiene la función JS `confirm` ya que es una función de demostración, aunque se recomienda usar modales personalizados. -->
+                                        
                                         <form method="POST" action="{{ url_for('app.delete_version', version_id=version.id) }}" class="inline" onsubmit="return confirm('¿Está seguro de que desea eliminar esta versión?')">
                                             <button type="submit" 
                                                     class="inline-flex items-center bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg font-semibold text-sm transition-colors">
@@ -302,10 +302,10 @@
                                     </div>
                                 </div>
 
-                                <!-- Detalles de la versión -->
+                                
                                 <div class="border-t border-gray-200 pt-4 mt-4">
                                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                        <!-- Documentación -->
+                                        
                                         <div class="flex items-start">
                                             <div class="flex-shrink-0 mr-3">
                                                 <div class="bg-blue-100 rounded-lg p-2">
@@ -316,7 +316,7 @@
                                             </div>
                                             <div>
                                                 <p class="text-xs text-gray-500 font-medium mb-1">Documentación</p>
-                                                <!-- CAMBIO: version.documentacion_url -> version.documentacion_url -->
+                                                
                                                 {% if version.documentacion_url %}
                                                     <a href="{{ version.documentacion_url }}" target="_blank" 
                                                        class="text-sm text-blue-600 hover:text-blue-700 hover:underline font-medium">
@@ -328,7 +328,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- SO Compatible -->
+                                        
                                         <div class="flex items-start">
                                             <div class="flex-shrink-0 mr-3">
                                                 <div class="bg-green-100 rounded-lg p-2">
@@ -341,9 +341,9 @@
                                                 <p class="text-xs text-gray-500 font-medium mb-1">Sistema Operativo Compatible</p>
                                                 {% if version.so_compatibles %}
                                                     <p class="text-sm text-gray-900 font-medium">
-                                                        <!-- CAMBIO: so.nombre_so -> so.name (Asumiendo el refactor del modelo SO) -->
+                                                        
                                                         {% for so in version.so_compatibles %}
-                                                            {{ so.name }}{% if not loop.last %}, {% endif %}
+                                                            {{ so.nombre_so  }}{% if not loop.last %}, {% endif %}
                                                         {% endfor %}
                                                     </p>
                                                 {% else %}
@@ -352,7 +352,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Soporte -->
+                                        
                                         <div class="flex items-start">
                                             <div class="flex-shrink-0 mr-3">
                                                 <div class="bg-purple-100 rounded-lg p-2">
@@ -363,10 +363,10 @@
                                             </div>
                                             <div>
                                                 <p class="text-xs text-gray-500 font-medium mb-1">Soporte</p>
-                                                <!-- CAMBIO: version.fecha_fin_soporte -> version.support_end_date -->
+                                                
                                                 {% if version.support_end_date %}
                                                     <p class="text-sm text-gray-900 font-medium">
-                                                        <!-- CAMBIO: version.fecha_inicio_soporte -> version.support_start_date -->
+                                                        
                                                         {{ version.support_start_date.strftime('%d/%m/%Y') if version.support_start_date else 'N/A' }} - 
                                                         {{ version.support_end_date.strftime('%d/%m/%Y') }}
                                                     </p>
@@ -381,7 +381,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Dueño -->
+                                        
                                         <div class="flex items-start">
                                             <div class="flex-shrink-0 mr-3">
                                                 <div class="bg-pink-100 rounded-lg p-2">
@@ -404,7 +404,7 @@
                 {% endif %}
             </div>
 
-            <!-- Footer del Card -->
+            
             <div class="bg-gray-50 px-8 py-4 border-t border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                     <p class="text-sm text-gray-600">
