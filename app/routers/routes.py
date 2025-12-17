@@ -73,6 +73,11 @@ def register_routes(app):
     def edit_version(version_id):
         return version_controller.edit_version(version_id)
 
+    @app_bp.route("/version/<int:version_id>/detail", methods=["GET"])
+    @login_required
+    def view_version(version_id):
+        return version_controller.view_version_detail(version_id)
+
     @app_bp.route("/version/<int:version_id>/delete", methods=["POST"])
     @login_required
     def delete_version(version_id):

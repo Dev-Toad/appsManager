@@ -6,10 +6,10 @@
 <div class="min-h-screen bg-gray-50 py-8">
     <div class="container mx-auto px-4 max-w-7xl">
         
-        <!-- Header Section -->
+        
         <div class="mb-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                <!-- Título y descripción -->
+                
                 <div class="mb-4 md:mb-0">
                     <h1 class="text-3xl font-bold text-gray-900 flex items-center">
                         <svg class="w-8 h-8 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,7 +20,7 @@
                     <p class="text-gray-600 mt-1">Administra todas las aplicaciones del sistema Atentus</p>
                 </div>
                 
-                <!-- Botón Crear Nueva -->
+                
                 <a href="{{ url_for('app.new_app') }}" 
                    class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,9 +31,9 @@
             </div>
         </div>
 
-        <!-- Stats Cards (sin cambios) -->
+        
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <!-- Total Aplicaciones -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -48,7 +48,7 @@
                 </div>
             </div>
 
-            <!-- Apps Web -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -65,7 +65,7 @@
                 </div>
             </div>
 
-            <!-- Apps API -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -80,7 +80,7 @@
                 </div>
             </div>
 
-            <!-- Apps Robot -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -96,7 +96,7 @@
             </div>
 
 
-             <!-- Replicador -->
+             
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-cyan-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            <!-- Script -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -122,7 +122,7 @@
                 </div>
             </div>
 
-            <!-- Bash -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -135,7 +135,7 @@
                 </div>
             </div>
 
-            <!-- Aplicación de Escritorio -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-pink-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -148,7 +148,7 @@
                 </div>
             </div>
 
-            <!-- Aplicación de Consola -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-teal-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -161,7 +161,7 @@
                 </div>
             </div>
 
-            <!-- App Nativa -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -174,7 +174,7 @@
                 </div>
             </div>
 
-            <!-- App Híbrida -->
+            
             <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-fuchsia-500">
                 <div class="flex items-center justify-between">
                     <div>
@@ -233,10 +233,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {% for app in apps %}
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                <!-- Logo/Header -->
+                
                 <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 flex items-center justify-center h-32">
                     <div class="flex items-center">
-                        <!-- Logo Atentus -->
+                        
                         <div class="bg-white rounded-full p-3 shadow-lg">
                             <svg class="w-12 h-12 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
@@ -245,12 +245,12 @@
                     </div>
                 </div>
 
-                <!-- Contenido -->
+                
                 <div class="p-6">
-                    <!-- Nombre -->
+                   
                     <h3 class="text-xl font-bold text-gray-900 mb-2">{{ app.nombre }}</h3>
                     
-                    <!-- Descripción -->
+                    
                     <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ app.descripcion[:100] }}{% if app.descripcion|length > 100 %}...{% endif %}</p>
                     
                     <div class="flex flex-wrap gap-2 mb-4">
@@ -259,7 +259,7 @@
                         </span>
                     </div>
 
-                    <!-- Información adicional -->
+                    
                     <div class="border-t border-gray-200 pt-4 mb-4">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">Tipo:</span>
@@ -267,14 +267,14 @@
                         </div>
                     </div>
 
-                    <!-- Botón Ver Proyecto -->
+                    
                     <a href="{{ url_for('app.view_app', app_id=app.id) }}" 
                        class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-center py-3 rounded-lg font-semibold transition-colors duration-200">
                         Ver Proyecto
                     </a>
                 </div>
 
-                <!-- Footer con acciones rápidas -->
+                
                 <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex justify-between items-center">
                     <a href="{{ url_for('app.edit_app', app_id=app.id) }}" 
                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
@@ -313,7 +313,7 @@
             {% endif %}
         </div>
 
-        <!-- Paginación (opcional) -->
+        
        {% if pagination %}
             <div class="mt-8 flex items-center justify-between">
                 <div class="text-sm text-gray-700">

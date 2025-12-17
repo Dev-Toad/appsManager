@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}Versión {{ version.version_number }} - {{ app.nombre }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-4 max-w-4xl">
+        
+        
+        <div class="mb-6">
+            <a href="{{ url_for('app.view_app', app_id=app.id) }}" 
+               class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-4">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Volver a "{{ app.nombre }}"
+            </a>
+        </div>
+
+        
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            
+            
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg class="w-8 h-8 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                        <div>
+                            <h1 class="text-3xl font-bold text-white">Versión {{ version.version_number }}</h1>
+                            <p class="text-blue-100 mt-1">{{ version.title }}</p>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('app.edit_version', version_id=version.id) }}"
+                       class="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg transition-all">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Editar
+                    </a>
+                </div>
+            </div>
+
+            
+            <div class="p-8">
+                
+                
+                <div class="mb-8">
+                    <div class="flex items-center mb-6 pb-2 border-b-2 border-blue-500">
+                        <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-800">Información de la Versión</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-blue-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Número de Versión</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ version.version_number }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-purple-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Título</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ version.title }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200 md:col-span-2">
+                            <div class="flex items-start">
+                                <div class="bg-green-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M4 6h16M4 12h16M4 18h7"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Descripción</p>
+                                    <p class="text-base text-gray-900 leading-relaxed">
+                                        {{ version.description or 'Sin descripción' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        {% if version.documentacion_url %}
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200 md:col-span-2">
+                            <div class="flex items-start">
+                                <div class="bg-indigo-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Documentación</p>
+                                    <a href="{{ version.documentacion_url }}" target="_blank"
+                                       class="text-base text-blue-600 hover:text-blue-700 hover:underline break-all">
+                                        {{ version.documentacion_url }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                
+                <div class="mb-8">
+                    <div class="flex items-center mb-6 pb-2 border-b-2 border-indigo-500">
+                        <svg class="w-6 h-6 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-800">Archivos Descargables</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start flex-1">
+                                    <div class="bg-indigo-100 rounded-lg p-3 mr-4">
+                                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M9 12h6m-6 4h6M7 20h10a2 2 0 002-2V10.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 4H7a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-500 mb-1">Archivo Ejecutable</p>
+                                        {% if version.executable_file_url %}
+                                            <p class="text-sm text-gray-900 font-medium mb-2 break-all">
+                                                {{ version.executable_file_url.split('/')[-1] }}
+                                            </p>
+                                            <a href="{{ url_for('app.download_version_file_route',
+                                                                version_id=version.id,
+                                                                file_type='executable') }}"
+                                               class="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                                </svg>
+                                                Descargar
+                                            </a>
+                                        {% else %}
+                                            <p class="text-sm text-gray-500 italic">No disponible</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start flex-1">
+                                    <div class="bg-emerald-100 rounded-lg p-3 mr-4">
+                                        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M4 6h16M4 12h16M4 18h7"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-500 mb-1">Docker Compose</p>
+                                        {% if version.docker_compose_url %}
+                                            <p class="text-sm text-gray-900 font-medium mb-2 break-all">
+                                                {{ version.docker_compose_url.split('/')[-1] }}
+                                            </p>
+                                            <a href="{{ url_for('app.download_version_file_route',
+                                                                version_id=version.id,
+                                                                file_type='docker_compose') }}"
+                                               class="inline-flex items-center text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                                </svg>
+                                                Descargar
+                                            </a>
+                                        {% else %}
+                                            <p class="text-sm text-gray-500 italic">No disponible</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        {% if version.docker_url %}
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200 md:col-span-2">
+                            <div class="flex items-start">
+                                <div class="bg-teal-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">URL Docker Compose</p>
+                                    <a href="{{ version.docker_url }}" target="_blank"
+                                       class="text-base text-blue-600 hover:text-blue-700 hover:underline break-all">
+                                        {{ version.docker_url }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                
+                <div class="mb-8">
+                    <div class="flex items-center mb-6 pb-2 border-b-2 border-purple-500">
+                        <svg class="w-6 h-6 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-800">Base de Datos y Dependencias</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        {% if version.db_manager %}
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-purple-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Gestor de Base de Datos</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ version.db_manager }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        
+                        {% if version.db_manager_version %}
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-pink-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Versión del Gestor</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ version.db_manager_version }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        
+                        {% if version.dependencias %}
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200 md:col-span-2">
+                            <div class="flex items-start">
+                                <div class="bg-orange-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-2">Dependencias</p>
+                                    <pre class="text-sm text-gray-900 bg-white p-3 rounded border border-gray-200 overflow-x-auto font-mono">{{ version.dependencias }}</pre>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                
+                <div class="mb-8">
+                    <div class="flex items-center mb-6 pb-2 border-b-2 border-green-500">
+                        <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-800">Período de Soporte</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-green-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Inicio de Soporte</p>
+                                    <p class="text-lg font-semibold text-gray-900">
+                                        {{ version.support_start_date.strftime('%d/%m/%Y') if version.support_start_date else 'No definida' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                            <div class="flex items-start">
+                                <div class="bg-red-100 rounded-lg p-3 mr-4">
+                                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Fin de Soporte</p>
+                                    <p class="text-lg font-semibold text-gray-900">
+                                        {{ version.support_end_date.strftime('%d/%m/%Y') if version.support_end_date else 'No definida' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            <div>
+                                <p class="text-xs text-blue-700 font-medium">Responsable</p>
+                                <p class="text-sm text-blue-600 font-semibold">{{ version.release_owner.username }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="bg-gray-50 border-l-4 border-gray-400 p-4 rounded-r-lg">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-gray-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div>
+                                <p class="text-xs text-gray-700 font-medium">Creada</p>
+                                <p class="text-sm text-gray-600 font-semibold">
+                                    {{ version.created_at.strftime('%d/%m/%Y %H:%M') if version.created_at else 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-purple-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            <div>
+                                <p class="text-xs text-purple-700 font-medium">Actualizada</p>
+                                <p class="text-sm text-purple-600 font-semibold">
+                                    {{ version.updated_at.strftime('%d/%m/%Y %H:%M') if version.updated_at else 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="flex items-center justify-center pt-6 border-t border-gray-200 mt-6">
+                    <a href="{{ url_for('app.view_app', app_id=app.id) }}" 
+                       class="inline-flex items-center px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Volver a la Aplicación
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

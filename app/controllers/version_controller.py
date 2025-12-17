@@ -238,6 +238,26 @@ def download_version_file(version_id, file_type):
     )
 
 
+@permissions_required(["version:view"])
+def view_version_detail(version_id):
+
+    version = db.session.get(Version, version_id)
+
+    if not version:
+        flash("Versión no encontrada.", "danger")
+        return redirect(url_for("app.app_list"))
+
+    app_instance = version.application
+
+    if not app_instance:
+        flash("No se pudo encontrar la aplicación asociada.", "danger")
+        return redirect(url_for("app.app_list"))
+
+    return render_template(
+        "dashboard/version/view_version.html", version=version, app=app_instance
+    )
+
+
 @permissions_required(["version:delete"])
 def delete_version(version_id):
     """Permite eliminar una versión existente."""
