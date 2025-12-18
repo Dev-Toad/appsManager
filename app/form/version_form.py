@@ -14,14 +14,16 @@ from wtforms import SelectMultipleField
 from wtforms.widgets import ListWidget, CheckboxInput
 
 SO_CHOICES = [
-    ("Windows 11", "Windows 11"),
-    ("Windows 10", "Windows 10"),
-    ("Ubuntu 22.04", "Ubuntu 22.04"),
-    ("Ubuntu 20.04", "Ubuntu 20.04"),
-    ("Debian 12", "Debian 12"),
-    ("CentOS 7", "CentOS 7"),
-    ("macOS", "macOS"),
+    ("Ubuntu Server 12.04", "Ubuntu Server 12.04"),
+    ("Ubuntu Server 14.04", "Ubuntu Server 14.04"),
+    ("Ubuntu Server 16.04", "Ubuntu Server 16.04"),
+    ("Ubuntu Server 18.04", "Ubuntu Server 18.04"),
+    ("Ubuntu Server 20.04", "Ubuntu Server 20.04"),
+    ("Ubuntu Server 22.04", "Ubuntu Server 22.04"),
+    ("Ubuntu Server 24.04", "Ubuntu Server 24.04"),
+    ("Ubuntu Server 26.04", "Ubuntu Server 26.04"),
 ]
+
 
 
 class MultiCheckboxField(SelectMultipleField):
