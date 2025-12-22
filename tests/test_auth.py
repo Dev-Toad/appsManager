@@ -37,7 +37,7 @@ def test_login_success(app):
 
     resp = client.post(
         "/login",
-        data={"username": "testuser", "password": "secret"},
+        data={"email": "test@example.com", "password": "secret"},
         follow_redirects=True,
     )
 

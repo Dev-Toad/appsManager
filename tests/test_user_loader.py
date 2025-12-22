@@ -25,11 +25,11 @@ def client(app):
     return app.test_client()
 
 
-def login(client, username, password="x"):
-    """Helper para hacer login en los tests."""
+def login(client, email, password="x"):
+    """Helper para hacer login en los tests (nuevo login por email)."""
     return client.post(
         "/login",
-        data={"username": username, "password": password},
+        data={"email": email, "password": password},
         follow_redirects=True,
     )
 
@@ -41,7 +41,6 @@ def setup_user(app):
     y el user_loader de Flask-Login.
     """
     with app.app_context():
-
         role = Role(name="Tester")
         db.session.add(role)
         db.session.commit()
@@ -69,7 +68,7 @@ def test_user_loader_login_flow(client, setup_user):
     """
     user = setup_user
 
-    resp = login(client, user.username)
-    assert resp.status_code == 200
+    resp = login(client, user.email, "x")
+    assert resp.status_code == 200, resp.data[:300]
 
     assert b"loader_user" in resp.data or b"Logout" in resp.data

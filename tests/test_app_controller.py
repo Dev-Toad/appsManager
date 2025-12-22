@@ -69,15 +69,18 @@ def setup_roles_and_users(app):
 
         return {
             "admin_id": admin_user.id,
-            "admin_username": admin_user.username,
+            "admin_email": admin_user.email,
             "dev_id": dev_user.id,
-            "dev_username": dev_user.username,
+            "dev_email": dev_user.email,
         }
 
 
-def login(client, username):
+def login(client, email):
+    """Login usando email (nuevo flujo)."""
     return client.post(
-        "/login", data={"username": username, "password": "x"}, follow_redirects=True
+        "/login",
+        data={"email": email, "password": "x"},
+        follow_redirects=True,
     )
 
 
@@ -91,11 +94,10 @@ def _crear_tipo_stack_framework():
 
 
 def test_crud_app_as_admin(client, app, setup_roles_and_users):
-    admin_data = setup_roles_and_users
-    admin_username = admin_data["admin_username"]
-    admin_id = admin_data["admin_id"]
+    admin_email = setup_roles_and_users["admin_email"]
+    admin_id = setup_roles_and_users["admin_id"]
 
-    login(client, admin_username)
+    login(client, admin_email)
 
     with app.app_context():
         app_type, stack, framework = _crear_tipo_stack_framework()
@@ -121,6 +123,7 @@ def test_crud_app_as_admin(client, app, setup_roles_and_users):
 
         app_obj = db.session.query(Application).filter_by(nombre="AppAdmin").first()
         assert app_obj is not None
+
         app_id = app_obj.id
         assert app_obj.owner_id == admin_id
 
@@ -154,16 +157,15 @@ def test_crud_app_as_admin(client, app, setup_roles_and_users):
         resp_delete = client.post(delete_url, follow_redirects=True)
 
         assert resp_delete.status_code == 200
-
         assert db.session.get(Application, app_id) is None
 
 
 def test_permission_denied_for_developer(client, app, setup_roles_and_users):
-    admin_username = setup_roles_and_users["admin_username"]
-    dev_username = setup_roles_and_users["dev_username"]
+    admin_email = setup_roles_and_users["admin_email"]
+    dev_email = setup_roles_and_users["dev_email"]
 
     with app.app_context():
-        login(client, admin_username)
+        login(client, admin_email)
         app_type, stack, framework = _crear_tipo_stack_framework()
 
         create_url = "/new/app"
@@ -189,7 +191,7 @@ def test_permission_denied_for_developer(client, app, setup_roles_and_users):
         assert app_to_edit is not None
         app_id = app_to_edit.id
 
-    login(client, dev_username)
+    login(client, dev_email)
 
     edit_url = f"/app/{app_id}/edit"
     resp_edit = client.post(

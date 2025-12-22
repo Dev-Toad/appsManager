@@ -102,16 +102,16 @@ def crear_permisos_roles_user_y_app():
         db.session.commit()
 
     return {
-        "user_username": user.username,
+        "user_email": user.email,
         "user_id": user.id,
         "app_id": app_obj.id,
     }
 
 
-def login_test_client(client, username):
+def login_test_client(client, email):
     return client.post(
         "/login",
-        data={"username": username, "password": "x"},
+        data={"email": email, "password": "x"},
         follow_redirects=True,
     )
 
@@ -119,11 +119,11 @@ def login_test_client(client, username):
 def test_create_edit_delete_version(app, client):
     with app.app_context():
         data = crear_permisos_roles_user_y_app()
-        user_username = data["user_username"]
+        user_email = data["user_email"]
         app_id = data["app_id"]
 
-    resp_login = login_test_client(client, user_username)
-    assert resp_login.status_code == 200
+    resp_login = login_test_client(client, user_email)
+    assert resp_login.status_code == 200, resp_login.data[:300]
 
     resp_create = client.post(
         f"/app/{app_id}/version/new",
@@ -140,7 +140,7 @@ def test_create_edit_delete_version(app, client):
         },
         follow_redirects=True,
     )
-    assert resp_create.status_code == 200
+    assert resp_create.status_code == 200, resp_create.data[:300]
 
     with app.app_context():
         v = (
@@ -170,7 +170,7 @@ def test_create_edit_delete_version(app, client):
         },
         follow_redirects=True,
     )
-    assert resp_edit.status_code == 200
+    assert resp_edit.status_code == 200, resp_edit.data[:300]
 
     with app.app_context():
         v_edited = db.session.get(Version, v.id)
@@ -178,7 +178,7 @@ def test_create_edit_delete_version(app, client):
         assert v_edited.db_manager_version == "14.1"
 
     resp_delete = client.post(f"/version/{v.id}/delete", follow_redirects=True)
-    assert resp_delete.status_code == 200
+    assert resp_delete.status_code == 200, resp_delete.data[:300]
 
     with app.app_context():
         assert db.session.get(Version, v.id) is None
