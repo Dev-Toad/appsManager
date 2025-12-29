@@ -15,7 +15,8 @@ services:
     volumes:
       - ./uploads:/app/uploads
       # Persistimos migraciones en producción (para que no se pierdan al recrear contenedor)
-      - migrations_data:/app/migrations
+      # - migrations_data:/app/migrations
+      - migrations_versions:/app/migrations/versions
     command: >
       bash -lc '
       set -e;
@@ -63,4 +64,5 @@ services:
 
 volumes:
   demo_pgdata:
-  migrations_data:
+  # migrations_data:
+  migrations_versions:
