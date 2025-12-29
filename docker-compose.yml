@@ -14,28 +14,29 @@ services:
       - "8000"
     volumes:
       - ./uploads:/app/uploads
+      # Persistimos migraciones en producción (para que no se pierdan al recrear contenedor)
       - migrations_data:/app/migrations
     command: >
-      bash -lc "
+      bash -lc '
       set -e;
 
-      # 1) Asegura carpeta de migraciones persistente
+      # Asegurar carpeta persistente
       mkdir -p /app/migrations;
 
-      # 2) Init solo si no existe estructura (versions/)
-      if [ ! -d /app/migrations/versions ]; then
+      # Init SOLO si no existe la estructura de Alembic
+      if [ ! -d /app/migrations/versions ] || [ ! -f /app/migrations/env.py ]; then
         flask db init;
       fi;
 
-      # 3) Genera migración si hay cambios (si no hay, no tumba el contenedor)
-      flask db migrate -m 'auto migrate' || true;
+      # Generar migración si hay cambios (si no hay, no falla)
+      flask db migrate -m "auto migrate" || true;
 
-      # 4) Aplica migraciones
+      # Aplicar migraciones
       flask db upgrade;
 
-      # 5) Levanta la app
-      gunicorn -b 0.0.0.0:8000 run:app
-      "
+      # Levantar app
+      exec gunicorn -b 0.0.0.0:8000 run:app
+      '
 
   db:
     image: postgres:16
@@ -57,6 +58,8 @@ services:
       - "80:80"
     volumes:
       - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    profiles:
+      - prod
 
 volumes:
   demo_pgdata:
