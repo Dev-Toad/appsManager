@@ -14,6 +14,28 @@ services:
       - "8000"
     volumes:
       - ./uploads:/app/uploads
+      - migrations_data:/app/migrations
+    command: >
+      bash -lc "
+      set -e;
+
+      # 1) Asegura carpeta de migraciones persistente
+      mkdir -p /app/migrations;
+
+      # 2) Init solo si no existe estructura (versions/)
+      if [ ! -d /app/migrations/versions ]; then
+        flask db init;
+      fi;
+
+      # 3) Genera migración si hay cambios (si no hay, no tumba el contenedor)
+      flask db migrate -m 'auto migrate' || true;
+
+      # 4) Aplica migraciones
+      flask db upgrade;
+
+      # 5) Levanta la app
+      gunicorn -b 0.0.0.0:8000 run:app
+      "
 
   db:
     image: postgres:16
@@ -38,3 +60,4 @@ services:
 
 volumes:
   demo_pgdata:
+  migrations_data:
