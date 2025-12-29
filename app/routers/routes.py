@@ -6,6 +6,7 @@ from app.controllers import (
     user_controller,
     dashboard_controller,
     frameworks_controller,
+    external_user_controller,
 )
 from flask import Blueprint
 from flask_login import login_required
@@ -15,6 +16,7 @@ def register_routes(app):
     app_bp = Blueprint("app", __name__)
     user_bp = Blueprint("user", __name__)
     rol_bp = Blueprint("rol", __name__)
+    exter_bp = Blueprint("external", __name__)
 
     # Rutas de Autenticación (auth_controller)
     @app_bp.route("/")
@@ -145,6 +147,13 @@ def register_routes(app):
     def toggle_user_status(user_id):
         return user_controller.toggle_user_status(user_id)
 
+    # Rutas de Usuarios (external_controller) - Blueprint: exter_bp
+    @exter_bp.route("/admin/external-users/assign-role", methods=["GET", "POST"])
+    @login_required
+    def assign_role_to_external_user():
+        return external_user_controller.assign_role_to_external_user()
+
     app.register_blueprint(app_bp)
     app.register_blueprint(rol_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(exter_bp)

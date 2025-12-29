@@ -10,20 +10,30 @@ def load_user(user_id):
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
+
     id = db.Column(db.Integer, primary_key=True)
+
     username = db.Column(db.String(64), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
+
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     full_name = db.Column(db.String(120), nullable=True)
+
     avatar_url = db.Column(db.String(256), nullable=True)
     last_login = db.Column(db.DateTime, nullable=True)
+
     role_id = db.Column(
-        db.Integer, db.ForeignKey("roles.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("roles.id"), nullable=True, index=True
     )
+
+    role = db.relationship("Role", back_populates="users", lazy="joined")
+
     is_active = db.Column(db.Boolean, default=True)
     is_superuser = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    role = db.relationship("Role", lazy="selectin")
+
+    external_user_id = db.Column(db.Integer, unique=True, index=True, nullable=True)
+
     owned_apps = db.relationship(
         "Application",
         foreign_keys="Application.owner_id",

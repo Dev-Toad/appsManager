@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from sqlalchemy import func
 from flask import render_template
+
 from app.config import db
 from app.models.user import User
 from app.models.role import Role, Permission
 
 
 def dashboard():
-
     now = datetime.utcnow()
     start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     one_hour_ago = now - timedelta(hours=1)
@@ -27,11 +27,10 @@ def dashboard():
 
     role_distribution_query = (
         db.session.query(Role.name, func.count(User.id))
-        .join(User)
+        .outerjoin(User, User.role_id == Role.id)
         .group_by(Role.name)
         .all()
     )
-
     role_distribution = dict(role_distribution_query)
 
     return render_template(

@@ -14,6 +14,7 @@ def seed_roles_and_permissions():
         "user:edit": "Permite modificar usuarios existentes (info, rol).",
         "user:view": "Permite ver el detalle del usuarios.",
         "user:toggle_status": "Permite activar o desactivar usuarios.",
+        "user:assign_role": "Permite asignar roles a usuarios externos.",
         "app:read": "Permite ver la lista de aplicaciones y sus detalles.",
         "app:create": "Permite crear nuevas aplicaciones.",
         "app:edit": "Permite modificar aplicaciones existentes.",
@@ -54,6 +55,7 @@ def seed_roles_and_permissions():
         permissions_objects["version:edit"],
         permissions_objects["version:view"],
         permissions_objects["version:delete"],
+        permissions_objects["user:assign_role"],
     ]
 
     roles_data = {

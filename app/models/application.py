@@ -3,7 +3,6 @@ from datetime import datetime
 
 
 APPLICATION_STATUSES = ["Activa", "En Desarrollo", "En Mantenimiento", "Retirada"]
-# ENVIRONMENT_TYPES = ["Servidor", "Cloud", "Kubernetes", "Local"]
 
 ENVIRONMENT_TYPES = [
     "Desarrollo",
