@@ -18,8 +18,12 @@ ENVIRONMENT_TYPES = [
 
 def get_developer_users_query():
     """Retorna la consulta para todos los Usuarios que son Desarrolladores."""
-    return db.session.execute(db.select(User).join(Role)).scalars()
-
+    # return db.session.execute(db.select(User).join(Role)).scalars()
+    return (
+        db.session.execute(db.select(User).join(Role))
+        .unique()
+        .scalars()
+    )
 
 def get_app_types_query():
     """Retorna la consulta para todos los Tipos de Aplicación."""
