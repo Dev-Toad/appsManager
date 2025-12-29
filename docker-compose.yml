@@ -7,7 +7,6 @@ services:
     environment:
       FLASK_APP: run:app
       FLASK_ENV: production
-      DATABASE_URL: postgresql://andres:1q2w3e4r5t@db:5432/demo
     depends_on:
       - db
     restart: unless-stopped

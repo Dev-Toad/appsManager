@@ -22,13 +22,19 @@ class Config:
 
     SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-de-desarrollo")
 
+    DEBUG_AUTH = os.getenv("DEBUG_AUTH", "0")
+
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+
+    SQLALCHEMY_BINDS = {"external": os.getenv("EXTERNAL_DATABASE_URL")}
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
     UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads", "versions")
     MAX_CONTENT_LENGTH = 500 * 1024 * 1024
+
     ALLOWED_EXTENSIONS = {
         "deb",
         "rpm",
@@ -51,6 +57,7 @@ class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     WTF_CSRF_ENABLED = False
+    DEBUG_AUTH = "1"
 
 
 def format_datetime(value, format="%d/%m/%Y %H:%M:%S"):
@@ -60,11 +67,11 @@ def format_datetime(value, format="%d/%m/%Y %H:%M:%S"):
     """
     if value is None:
         return ""
+
     if isinstance(value, str):
         try:
             value = datetime.fromisoformat(value)
         except ValueError:
-
             return value
 
     return value.strftime(format)
@@ -79,7 +86,11 @@ def create_app(config_object=Config):
     template_folder = os.path.join(project_root, "app", "views", "templates")
     static_folder = os.path.join(project_root, "app", "views", "static")
 
-    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+    app = Flask(
+        __name__,
+        template_folder=template_folder,
+        static_folder=static_folder,
+    )
 
     app.config.from_object(config_object)
 
@@ -94,6 +105,7 @@ def create_app(config_object=Config):
 
     register_routes(app)
     commands.register_commands(app)
+
     app.context_processor(inject_user_data)
 
     app.jinja_env.filters["datetimeformat"] = format_datetime
