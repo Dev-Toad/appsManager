@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -61,10 +61,6 @@ class TestConfig(Config):
 
 
 def format_datetime(value, format="%d/%m/%Y %H:%M:%S"):
-    """
-    Formatea un objeto datetime a la cadena deseada.
-    Se usa como un filtro de Jinja: {{ role.created_at | datetimeformat }}
-    """
     if value is None:
         return ""
 
@@ -77,8 +73,26 @@ def format_datetime(value, format="%d/%m/%Y %H:%M:%S"):
     return value.strftime(format)
 
 
+def register_error_handlers(app):
+
+    @app.errorhandler(403)
+    def forbidden_error(error):
+        """Maneja el error 403 - Acceso prohibido."""
+        return render_template("dashboard/errors/403.html"), 403
+
+    @app.errorhandler(404)
+    def not_found_error(error):
+        """Maneja el error 404 - Página no encontrada."""
+        return render_template("dashboard/errors/404.html"), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        """Maneja el error 500 - Error interno del servidor."""
+        db.session.rollback()
+        return render_template("dashboard/errors/500.html"), 500
+
+
 def create_app(config_object=Config):
-    """Crea y configura la instancia de la aplicación Flask."""
 
     base_dir = os.path.abspath(os.path.dirname(__file__))
     project_root = os.path.dirname(os.path.dirname(base_dir))
@@ -104,7 +118,10 @@ def create_app(config_object=Config):
     from app.routers import register_routes
 
     register_routes(app)
+
     commands.register_commands(app)
+
+    register_error_handlers(app)
 
     app.context_processor(inject_user_data)
 

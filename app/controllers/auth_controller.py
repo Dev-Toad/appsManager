@@ -26,9 +26,19 @@ def _get_default_role():
     return Role.query.filter(func.lower(Role.name) == DEFAULT_ROLE_NAME.lower()).first()
 
 
+def _redirect_after_login(user):
+
+    if (
+        getattr(user, "role", None)
+        and getattr(user.role, "name", None) == "Administrador"
+    ):
+        return redirect(url_for("app.dashboard"))
+    return redirect(url_for("app.app_list"))
+
+
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for("app.dashboard"))
+        return _redirect_after_login(current_user)
     return redirect(url_for("app.login"))
 
 
@@ -54,7 +64,7 @@ def login():
                 login_user(local_admin)
                 local_admin.last_login = datetime.now()
                 db.session.commit()
-                return redirect(url_for("app.dashboard"))
+                return _redirect_after_login(local_admin)
 
             flash("Usuario o contraseña inválidos")
             return render_template("auth/login.html"), 401
@@ -84,7 +94,6 @@ def login():
         local_user = User.query.filter_by(external_user_id=ext.admin_usuario_id).first()
 
         if not local_user:
-
             local_user = User(
                 username=(ext.email or "").strip().lower(),
                 password_hash=EXTERNAL_SENTINEL,
@@ -97,7 +106,6 @@ def login():
             db.session.add(local_user)
             db.session.commit()
         else:
-
             if not local_user.is_active:
                 flash("Usuario deshabilitado en este sistema.")
                 return render_template("auth/login.html"), 403
@@ -111,7 +119,7 @@ def login():
             db.session.commit()
 
         login_user(local_user)
-        return redirect(url_for("app.dashboard"))
+        return _redirect_after_login(local_user)
 
     return render_template("auth/login.html")
 
