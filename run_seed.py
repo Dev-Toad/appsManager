@@ -58,6 +58,7 @@ STACKS_AND_FRAMEWORKS = {
         "Next.js",
         "Nuxt.js",
         "Electron",
+        "React.Js",
     ],
     "TypeScript": [
         "NestJS",
@@ -65,6 +66,7 @@ STACKS_AND_FRAMEWORKS = {
         "Angular",
         "Deno",
         "AdonisJS",
+        "React.Js",
     ],
     "Kotlin": [
         "Spring Boot",
