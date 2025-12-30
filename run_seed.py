@@ -38,6 +38,10 @@ STACKS_AND_FRAMEWORKS = {
         "FastAPI",
         "Tornado",
         "Pyramid",
+        "Selenium",
+        "Selenium-4",
+        "Playwright",
+        "Appium",
     ],
     "Ruby": [
         "Ruby on Rails",
