@@ -47,10 +47,10 @@ def crear_permisos_roles_user_y_app():
         "version:delete", "Eliminar versiones de aplicaciones"
     )
 
-    role = Role.query.filter_by(name="Desarrollador").first()
+    role = Role.query.filter_by(name="Administrador").first()
     if not role:
         role = Role(
-            name="Desarrollador",
+            name="Administrador",
             permissions=[p_create, p_edit, p_delete],
         )
         db.session.add(role)
@@ -109,11 +109,15 @@ def crear_permisos_roles_user_y_app():
 
 
 def login_test_client(client, email):
-    return client.post(
+    resp = client.post(
         "/login",
         data={"email": email, "password": "x"},
-        follow_redirects=True,
+        follow_redirects=False,
     )
+    assert resp.status_code in (302, 303), resp.data[:300]
+    with client.session_transaction() as sess:
+        assert sess.get("_user_id") is not None
+    return resp
 
 
 def test_create_edit_delete_version(app, client):
@@ -123,7 +127,7 @@ def test_create_edit_delete_version(app, client):
         app_id = data["app_id"]
 
     resp_login = login_test_client(client, user_email)
-    assert resp_login.status_code == 200, resp_login.data[:300]
+    assert resp_login.status_code in (302, 303)
 
     resp_create = client.post(
         f"/app/{app_id}/version/new",
