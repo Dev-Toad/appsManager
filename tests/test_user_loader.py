@@ -26,12 +26,17 @@ def client(app):
 
 
 def login(client, email, password="x"):
-    """Helper para hacer login en los tests (nuevo login por email)."""
-    return client.post(
+    resp = client.post(
         "/login",
         data={"email": email, "password": password},
-        follow_redirects=True,
+        follow_redirects=False,
     )
+    assert resp.status_code in (302, 303), resp.data[:300]
+
+    with client.session_transaction() as sess:
+        assert sess.get("_user_id") is not None
+
+    return resp
 
 
 @pytest.fixture(scope="function")
@@ -41,7 +46,7 @@ def setup_user(app):
     y el user_loader de Flask-Login.
     """
     with app.app_context():
-        role = Role(name="Tester")
+        role = Role(name="Administrador", active=True)
         db.session.add(role)
         db.session.commit()
 
@@ -62,13 +67,10 @@ def setup_user(app):
 
 
 def test_user_loader_login_flow(client, setup_user):
-    """
-    Verifica que el usuario puede hacer login correctamente
-    y que la aplicación responde 200.
-    """
     user = setup_user
 
     resp = login(client, user.email, "x")
-    assert resp.status_code == 200, resp.data[:300]
+    assert resp.status_code in (302, 303)
 
-    assert b"loader_user" in resp.data or b"Logout" in resp.data
+    redirected = client.get(resp.headers["Location"], follow_redirects=True)
+    assert redirected.status_code == 200

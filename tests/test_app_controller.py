@@ -4,6 +4,7 @@ from app.config import create_app, db, TestConfig
 from app.models.role import Role, Permission
 from app.models.user import User
 from app.models.application import Application, ApplicationType, Stack, Framework
+from app.models.external_user import ExternalUser
 
 
 @pytest.fixture(scope="function")
@@ -26,24 +27,27 @@ def client(app):
 @pytest.fixture(scope="function")
 def setup_roles_and_users(app):
     with app.app_context():
-        perm_create = Permission(name="app:create", description="Crear aplicaciones")
-        perm_read = Permission(name="app:read", description="Ver aplicaciones")
-        perm_edit = Permission(name="app:edit", description="Editar aplicaciones")
-        perm_delete = Permission(name="app:delete", description="Eliminar aplicaciones")
-        perm_admin = Permission(name="admin:access", description="Acceso a panel admin")
+
+        perm_create = Permission(name="app:create")
+        perm_read = Permission(name="app:read")
+        perm_edit = Permission(name="app:edit")
+        perm_delete = Permission(name="app:delete")
+        perm_admin = Permission(name="admin:access")
 
         db.session.add_all([perm_create, perm_read, perm_edit, perm_delete, perm_admin])
         db.session.commit()
 
         admin_role = Role(
-            name="Administrator",
+            name="Administrador",
             permissions=[perm_create, perm_read, perm_edit, perm_delete, perm_admin],
         )
         dev_role = Role(
             name="Desarrollador",
             permissions=[perm_create, perm_read],
         )
-        db.session.add_all([admin_role, dev_role])
+        default_role = Role(name="User", permissions=[perm_read])
+
+        db.session.add_all([admin_role, dev_role, default_role])
         db.session.commit()
 
         temp_user = User()
@@ -57,31 +61,50 @@ def setup_roles_and_users(app):
             role_id=admin_role.id,
             is_active=True,
         )
-        dev_user = User(
-            username="dev_user",
-            email="dev@test.com",
-            password_hash=password_hash_val,
-            role_id=dev_role.id,
-            is_active=True,
+        db.session.add(admin_user)
+        db.session.commit()
+
+        dev_email = "dev@test.com"
+
+        import hashlib
+        from datetime import date, timedelta
+
+        raw_password = "x"
+        md5_password = hashlib.md5(raw_password.encode("utf-8")).hexdigest()
+
+        ext = ExternalUser(
+            admin_usuario_id=999,
+            admin_tipo_id=7,
+            email=dev_email,
+            password=md5_password,
+            nombre="Dev Externo",
+            fecha_expiracion=date.today() + timedelta(days=365),
+            puede_marcar=True,
         )
-        db.session.add_all([admin_user, dev_user])
+        db.session.add(ext)
         db.session.commit()
 
         return {
             "admin_id": admin_user.id,
             "admin_email": admin_user.email,
-            "dev_id": dev_user.id,
-            "dev_email": dev_user.email,
+            "dev_id": ext.admin_usuario_id,
+            "dev_email": dev_email,
         }
 
 
 def login(client, email):
-    """Login usando email (nuevo flujo)."""
-    return client.post(
+    """Login usando email (flujo tests). Falla rápido si no se loguea."""
+    resp = client.post(
         "/login",
         data={"email": email, "password": "x"},
-        follow_redirects=True,
+        follow_redirects=False,
     )
+    assert resp.status_code in (302, 303), resp.data[:300]
+
+    with client.session_transaction() as sess:
+        assert sess.get("_user_id") is not None
+
+    return resp
 
 
 def _crear_tipo_stack_framework():

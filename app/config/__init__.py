@@ -56,6 +56,8 @@ class Config:
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    # SQLALCHEMY_BINDS = {}
+    SQLALCHEMY_BINDS = {"external": "sqlite:///:memory:"}
     WTF_CSRF_ENABLED = False
     DEBUG_AUTH = "1"
 
